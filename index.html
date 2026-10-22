@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operations Dashboard | SAP Fiori Style</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PapaParse for CSV Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <style>
+    .fiori-card {
+      background: #ffffff;
+      border: 1px solid #d9d9d9;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      transition: all 0.2s ease-in-out;
+    }
+    .fiori-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center border border-slate-200">
+      <div class="mb-4 inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full font-bold text-xl">
+        SAP
+      </div>
+      <h2 class="text-2xl font-bold text-slate-800">Management Portal</h2>
+      <p class="text-sm text-slate-500 mb-6">Enter passcode to access live reports</p>
+      
+      <!-- Input handles both button click and Enter key press -->
+      <form onsubmit="event.preventDefault(); checkAuth();">
+        <input type="password" id="passcode" placeholder="Enter Access PIN" class="w-full px-4 py-2 border rounded-lg mb-4 text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition">Login</button>
+      </form>
+      
+      <p id="loginError" class="text-red-500 text-xs mt-3 hidden">Invalid Access PIN! Try: 1234</p>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="appContainer" class="hidden min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-800 text-white px-6 py-3 flex justify-between items-center shadow-md">
+      <div class="flex items-center space-x-3">
+        <span class="bg-blue-600 text-xs px-2 py-1 rounded font-mono font-bold tracking-wider">FIORI</span>
+        <h1 class="text-lg font-semibold tracking-wide">Operations & Store Report Portal</h1>
+      </div>
+      <div class="flex items-center space-x-4 text-sm">
+        <span id="lastUpdated" class="text-slate-400">Updating...</span>
+        <button onclick="loadAllSheets()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-md text-xs font-medium transition">🔄 Refresh Data</button>
+        <button onclick="logout()" class="text-slate-400 hover:text-white transition">Logout</button>
+      </div>
+    </header>
+
+    <div class="flex flex-1">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-white border-r border-slate-200 p-4 space-y-1">
+        <div class="text-xs font-bold text-slate-400 uppercase px-3 mb-2">Navigation</div>
+        <button onclick="switchTab('daily')" id="btn-daily" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg font-medium text-blue-600 bg-blue-50 font-bold transition flex items-center space-x-2">
+          <span>📝</span> <span>Daily Work Updates</span>
+        </button>
+        <button onclick="switchTab('inward')" id="btn-inward" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition flex items-center space-x-2">
+          <span>📥</span> <span>Inward Material</span>
+        </button>
+        <button onclick="switchTab('store')" id="btn-store" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition flex items-center space-x-2">
+          <span>📤</span> <span>Store Issue Log</span>
+        </button>
+        <button onclick="switchTab('stock')" id="btn-stock" class="tab-btn w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition flex items-center space-x-2">
+          <span>📊</span> <span>Stock Register</span>
+        </button>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 p-6 space-y-6 overflow-y-auto">
+        <!-- KPI Summary Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="fiori-card p-4">
+            <p class="text-xs font-semibold text-slate-400 uppercase">Today's Tasks</p>
+            <h3 id="kpiTasks" class="text-2xl font-bold text-slate-800 mt-1">--</h3>
+          </div>
+          <div class="fiori-card p-4">
+            <p class="text-xs font-semibold text-slate-400 uppercase">Inward Entries Today</p>
+            <h3 id="kpiInward" class="text-2xl font-bold text-blue-600 mt-1">--</h3>
+          </div>
+          <div class="fiori-card p-4">
+            <p class="text-xs font-semibold text-slate-400 uppercase">Items Issued</p>
+            <h3 id="kpiStore" class="text-2xl font-bold text-amber-600 mt-1">--</h3>
+          </div>
+          <div class="fiori-card p-4">
+            <p class="text-xs font-semibold text-slate-400 uppercase">Low Stock Alerts</p>
+            <h3 id="kpiStock" class="text-2xl font-bold text-red-600 mt-1">--</h3>
+          </div>
+        </div>
+
+        <!-- Dynamic Content Section -->
+        <div class="fiori-card p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h2 id="sectionTitle" class="text-xl font-bold text-slate-800">Daily Work Updates Log</h2>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Filter records..." class="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+          </div>
+
+          <!-- Table Wrapper -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead id="tableHead" class="bg-slate-50 border-b text-slate-500 uppercase text-xs font-semibold">
+                <!-- Dynamic Header -->
+              </thead>
+              <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-700">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
