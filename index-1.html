@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Operations Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Apply saved theme before paint (no flash) -->
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('ops_theme');
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace']
+        },
+        colors: {
+          canvas:  'rgb(var(--canvas) / <alpha-value>)',
+          surface: 'rgb(var(--surface) / <alpha-value>)',
+          sunken:  'rgb(var(--sunken) / <alpha-value>)',
+          line:    'rgb(var(--line) / <alpha-value>)',
+          ink:     'rgb(var(--ink) / <alpha-value>)',
+          soft:    'rgb(var(--soft) / <alpha-value>)',
+          faint:   'rgb(var(--faint) / <alpha-value>)',
+          brand:   'rgb(var(--brand) / <alpha-value>)'
+        },
+        boxShadow: { card: 'var(--shadow-card)', pop: 'var(--shadow-pop)' }
+      }
+    }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<style>
+  :root {
+    --canvas: 248 249 251; --surface: 255 255 255; --sunken: 243 244 247; --line: 230 232 237;
+    --ink: 16 24 40; --soft: 96 105 122; --faint: 144 151 166; --brand: 99 91 255;
+    --shadow-card: 0 1px 2px rgba(16,24,40,.04), 0 1px 1px rgba(16,24,40,.02);
+    --shadow-pop: 0 16px 40px -12px rgba(16,24,40,.22), 0 2px 8px rgba(16,24,40,.06);
+    color-scheme: light;
+  }
+  .dark {
+    --canvas: 9 9 11; --surface: 17 17 21; --sunken: 25 25 31; --line: 39 39 48;
+    --ink: 236 237 242; --soft: 158 163 178; --faint: 108 113 128; --brand: 129 122 255;
+    --shadow-card: 0 1px 2px rgba(0,0,0,.4);
+    --shadow-pop: 0 16px 40px -12px rgba(0,0,0,.7), 0 2px 8px rgba(0,0,0,.4);
+    color-scheme: dark;
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-feature-settings: 'cv11', 'ss01'; letter-spacing: -0.006em; }
+  ::selection { background: rgb(var(--brand) / .22); }
+  * { scrollbar-width: thin; scrollbar-color: rgb(var(--line)) transparent; }
+
+  /* Accent tones: set variables, then use .tint on badges/tiles */
+  .tn-green  { --fg:#047857; --bg:#ecfdf5; --bd:#a7f3d0; }
+  .tn-blue   { --fg:#1d4ed8; --bg:#eff6ff; --bd:#bfdbfe; }
+  .tn-amber  { --fg:#b45309; --bg:#fffbeb; --bd:#fde68a; }
+  .tn-red    { --fg:#b91c1c; --bg:#fef2f2; --bd:#fecaca; }
+  .tn-violet { --fg:#6d28d9; --bg:#f5f3ff; --bd:#ddd6fe; }
+  .tn-brand  { --fg:#4f46e5; --bg:#eef2ff; --bd:#c7d2fe; }
+  .tn-slate  { --fg:#475467; --bg:#f2f4f7; --bd:#e4e7ec; }
+  .dark .tn-green  { --fg:#34d399; --bg:rgba(16,185,129,.10); --bd:rgba(16,185,129,.25); }
+  .dark .tn-blue   { --fg:#60a5fa; --bg:rgba(59,130,246,.10); --bd:rgba(59,130,246,.28); }
+  .dark .tn-amber  { --fg:#fbbf24; --bg:rgba(245,158,11,.10); --bd:rgba(245,158,11,.26); }
+  .dark .tn-red    { --fg:#f87171; --bg:rgba(239,68,68,.10); --bd:rgba(239,68,68,.28); }
+  .dark .tn-violet { --fg:#a78bfa; --bg:rgba(139,92,246,.12); --bd:rgba(139,92,246,.30); }
+  .dark .tn-brand  { --fg:#a5b4fc; --bg:rgba(99,102,241,.14); --bd:rgba(99,102,241,.32); }
+  .dark .tn-slate  { --fg:#a0a4b2; --bg:rgba(255,255,255,.05); --bd:rgba(255,255,255,.10); }
+  .tint { color: var(--fg); background: var(--bg); border: 1px solid var(--bd); }
+  .dot  { width: 6px; height: 6px; border-radius: 999px; background: var(--fg); display: inline-block; }
+
+  .badge { display:inline-flex; align-items:center; gap:6px; height:22px; padding:0 9px; border-radius:999px; font-size:12px; font-weight:500; white-space:nowrap; }
+  .badge:not(.nodot)::before { content:''; width:6px; height:6px; border-radius:999px; background:var(--fg); }
+
+  .btn { display:inline-flex; align-items:center; gap:8px; height:32px; padding:0 12px; border-radius:8px; border:1px solid rgb(var(--line)); background:rgb(var(--surface)); font-size:13px; font-weight:500; color:rgb(var(--ink)); box-shadow:var(--shadow-card); transition:background .15s, border-color .15s, transform .1s; }
+  .btn:hover { background: rgb(var(--sunken)); }
+  .btn:active { transform: scale(.985); }
+  .btn:disabled { opacity:.55; pointer-events:none; }
+  .ibtn { display:grid; place-items:center; width:32px; height:32px; border-radius:8px; color:rgb(var(--soft)); transition:background .15s, color .15s; }
+  .ibtn:hover { background: rgb(var(--sunken)); color: rgb(var(--ink)); }
+  .kbd { font-family:'JetBrains Mono',monospace; font-size:11px; color:rgb(var(--faint)); border:1px solid rgb(var(--line)); background:rgb(var(--sunken)); border-radius:5px; padding:1px 6px; }
+
+  /* Sidebar */
+  #sidebar { width:248px; transition: width .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1); }
+  .nav-item { display:flex; align-items:center; gap:10px; width:100%; position:relative; padding:8px 10px; border-radius:8px; font-size:13.5px; font-weight:500; color:rgb(var(--soft)); transition: background .15s, color .15s; white-space:nowrap; }
+  .nav-item:hover { background: rgb(var(--sunken)); color: rgb(var(--ink)); }
+  .nav-item.active { background: rgb(var(--sunken)); color: rgb(var(--ink)); }
+  .nav-item.active svg { color: rgb(var(--brand)); }
+  .nav-item.active::before { content:''; position:absolute; left:-12px; top:8px; bottom:8px; width:2px; border-radius:2px; background:rgb(var(--brand)); }
+  .nav-count { font-size:11px; padding:1px 7px; border-radius:999px; background:rgb(var(--canvas)); border:1px solid rgb(var(--line)); color:rgb(var(--faint)); font-variant-numeric:tabular-nums; }
+  .nav-count:empty { display:none; }
+  #scrim { transition: opacity .25s; }
+
+  @media (min-width: 1024px) {
+    #app[data-collapsed="true"] #sidebar { width: 68px; }
+    #app[data-collapsed="true"] .nav-label,
+    #app[data-collapsed="true"] .nav-count,
+    #app[data-collapsed="true"] .brand-text,
+    #app[data-collapsed="true"] .user-text { display: none; }
+    #app[data-collapsed="true"] .nav-item { justify-content: center; }
+    #app[data-collapsed="true"] .user-row { flex-direction: column; }
+    #app[data-collapsed="true"] .nav-item:hover::after {
+      content: attr(data-tip); position:absolute; left: calc(100% + 14px); top:50%; transform: translateY(-50%);
+      background: rgb(var(--ink)); color: rgb(var(--surface)); font-size:12px; padding:4px 9px; border-radius:6px;
+      white-space:nowrap; pointer-events:none; z-index:70; box-shadow: var(--shadow-pop);
+    }
+  }
+  @media (max-width: 1023px) {
+    #sidebar { position: fixed; top: 0; left: 0; width: 264px; transform: translateX(-100%); box-shadow: var(--shadow-pop); }
+    #app[data-drawer="open"] #sidebar { transform: none; }
+    #app[data-drawer="open"] #scrim { opacity: 1; pointer-events: auto; }
+  }
+
+  /* Table */
+  table.data { width:100%; border-collapse:separate; border-spacing:0; }
+  table.data th { position:sticky; top:0; z-index:5; text-align:left; padding:10px 16px; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:rgb(var(--soft)); background:rgb(var(--sunken)); border-bottom:1px solid rgb(var(--line)); white-space:nowrap; cursor:pointer; user-select:none; }
+  table.data th:hover { color: rgb(var(--ink)); }
+  table.data td { padding:12px 16px; border-bottom:1px solid rgb(var(--line) / .7); font-size:13px; vertical-align:top; min-width:96px; max-width:380px; overflow-wrap:anywhere; transition: background .12s; }
+  table.data tbody tr:last-child td { border-bottom:0; }
+  table.data tbody tr:hover td { background: rgb(var(--sunken) / .65); }
+  .sort { display:inline-flex; vertical-align:middle; margin-left:6px; opacity:0; transition:opacity .15s; }
+  table.data th:hover .sort { opacity:.6; }
+  .sort.on { opacity:1 !important; color: rgb(var(--brand)); }
+  mark { background: rgb(var(--brand) / .22); color: inherit; border-radius: 3px; padding: 0 1px; }
+  .row-in { animation: fadeUp .28s both; }
+
+  .chip { display:inline-flex; align-items:center; gap:7px; height:28px; padding:0 10px; border-radius:8px; border:1px solid transparent; font-size:12.5px; font-weight:500; color:rgb(var(--soft)); transition:all .15s; }
+  .chip:hover { background: rgb(var(--sunken)); color: rgb(var(--ink)); }
+  .chip.on { background: rgb(var(--sunken)); border-color: rgb(var(--line)); color: rgb(var(--ink)); box-shadow: var(--shadow-card); }
+
+  .sk { background: linear-gradient(90deg, rgb(var(--sunken)) 25%, rgb(var(--line) / .6) 37%, rgb(var(--sunken)) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: 6px; }
+
+  /* Login */
+  .login-bg {
+    background:
+      radial-gradient(60% 45% at 50% 0%, rgb(var(--brand) / .16), transparent 70%),
+      linear-gradient(rgb(var(--line) / .5) 1px, transparent 1px) 0 0 / 44px 44px,
+      linear-gradient(90deg, rgb(var(--line) / .5) 1px, transparent 1px) 0 0 / 44px 44px,
+      rgb(var(--canvas));
+  }
+  .login-card { animation: pop .35s cubic-bezier(.2,.8,.2,1) both; }
+  #login { transition: opacity .25s, visibility .25s; }
+  #login.leaving { opacity: 0; pointer-events: none; }
+  #login.leaving .login-card { transform: scale(.97) translateY(-6px); transition: transform .25s; }
+  .pin-box { width:52px; height:60px; border-radius:12px; border:1px solid rgb(var(--line)); background:rgb(var(--surface)); text-align:center; font-size:22px; font-weight:600; color:rgb(var(--ink)); outline:none; transition:border-color .15s, box-shadow .15s, transform .15s; caret-color:transparent; }
+  .pin-box:focus { border-color: rgb(var(--brand)); box-shadow: 0 0 0 4px rgb(var(--brand) / .15); }
+  .pin-box.filled { border-color: rgb(var(--brand) / .55); }
+  .pin-box.err { border-color:#ef4444; box-shadow:0 0 0 4px rgba(239,68,68,.12); }
+  .pin-box:disabled { opacity:.5; }
+  .shake { animation: shake .4s; }
+  @media (max-width: 380px) { .pin-box { width:46px; height:54px; } }
+
+  /* Toast */
+  .toast { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px; background:rgb(var(--ink)); color:rgb(var(--surface)); font-size:13px; font-weight:500; box-shadow:var(--shadow-pop); animation: toastIn .25s both; }
+  .toast.out { animation: toastOut .25s both; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform:none; } }
+  @keyframes pop { from { opacity:0; transform: translateY(10px) scale(.98); } to { opacity:1; transform:none; } }
+  @keyframes shake { 10%,90%{transform:translateX(-1px)} 20%,80%{transform:translateX(3px)} 30%,50%,70%{transform:translateX(-6px)} 40%,60%{transform:translateX(6px)} }
+  @keyframes toastIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes toastOut { to { opacity:0; transform: translateY(8px); } }
+  @keyframes pulse2 { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+  .spinning svg { animation: spin .8s linear infinite; }
+  .pulse { animation: pulse2 1.2s ease-in-out infinite; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+
+<body class="bg-canvas font-sans text-ink antialiased">
+
+<!-- ═════════════════════════ PIN LOGIN ═════════════════════════ -->
+<div id="login" class="login-bg fixed inset-0 z-50 grid place-items-center p-4">
+  <div class="login-card w-full max-w-[380px] rounded-2xl border border-line bg-surface p-8 shadow-pop">
+    <div class="tn-brand tint mx-auto grid h-12 w-12 place-items-center rounded-xl">
+      <svg data-i="lock" class="h-5 w-5"></svg>
+    </div>
+    <h1 class="mt-5 text-center text-xl font-semibold tracking-tight">Management Portal</h1>
+    <p class="mt-1.5 text-center text-sm text-soft">Enter your PIN to open the live reports.</p>
+
+    <form id="pinForm" class="mt-7" autocomplete="off">
+      <div id="pinWrap" class="flex justify-center gap-2.5" role="group" aria-label="Enter PIN"></div>
+      <p id="pinMsg" class="mt-4 h-5 text-center text-[13px]" role="alert" aria-live="polite"></p>
+      <button id="pinBtn" type="submit" class="mt-3 h-10 w-full rounded-lg bg-brand text-sm font-medium text-white shadow-sm transition hover:brightness-110 active:scale-[.99] disabled:opacity-50">Unlock dashboard</button>
+    </form>
+
+    <p class="mt-5 flex items-center justify-center gap-1.5 text-xs text-faint">
+      <svg data-i="shield" class="h-3.5 w-3.5"></svg> Session ends when this tab is closed
+    </p>
+  </div>
+</div>
+
+<!-- ═════════════════════════ APP ═════════════════════════ -->
+<div id="app" class="hidden min-h-screen" data-collapsed="false" data-drawer="closed">
+  <div class="flex min-h-screen">
+
+    <div id="scrim" class="pointer-events-none fixed inset-0 z-30 bg-slate-900/40 opacity-0 lg:hidden"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sticky top-0 z-40 flex h-screen shrink-0 flex-col border-r border-line bg-surface">
+      <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-line px-5">
+        <div class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-brand to-indigo-400 text-white shadow-sm">
+          <svg data-i="layers" class="h-4 w-4"></svg>
+        </div>
+        <div class="brand-text leading-tight">
+          <div class="text-sm font-semibold tracking-tight">Operations</div>
+          <div class="text-[11px] text-faint">Store &amp; Reports</div>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-3 py-4">
+        <div class="brand-text mb-2 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-faint">Reports</div>
+        <div id="nav" class="space-y-0.5"></div>
+      </nav>
+
+      <div class="border-t border-line p-3">
+        <div class="user-row flex items-center gap-2.5">
+          <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-slate-700 to-slate-500 text-xs font-semibold text-white">A</div>
+          <div class="user-text min-w-0 flex-1 leading-tight">
+            <div class="truncate text-[13px] font-medium">Administrator</div>
+            <div class="truncate text-[11px] text-faint">Management access</div>
+          </div>
+          <button id="logoutBtn" class="ibtn" title="Lock dashboard" aria-label="Lock dashboard"><svg data-i="logout" class="h-4 w-4"></svg></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content column -->
+    <div class="flex min-w-0 flex-1 flex-col">
+
+      <!-- Header -->
+      <header class="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-surface/80 px-4 backdrop-blur-md sm:px-6">
+        <button id="sidebarToggle" class="ibtn -ml-1" title="Toggle sidebar" aria-label="Toggle sidebar"><svg data-i="panel" class="h-[18px] w-[18px]"></svg></button>
+        <div class="hidden h-4 w-px bg-line sm:block"></div>
+        <div class="flex min-w-0 items-center gap-2 text-[13px]">
+          <span class="hidden text-faint sm:inline">Reports</span>
+          <span class="hidden text-faint sm:inline">/</span>
+          <span id="crumb" class="truncate font-medium">Daily Work Updates</span>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2 sm:gap-3">
+          <div class="hidden items-center gap-2 rounded-lg border border-line bg-sunken/60 px-2.5 py-1 text-xs text-soft md:flex" title="Live clock">
+            <span class="dot tn-green pulse"></span>
+            <span id="clockDate"></span>
+            <span class="text-line">|</span>
+            <span id="clockTime" class="font-mono tabular-nums text-ink"></span>
+          </div>
+          <div class="hidden items-center gap-1.5 text-xs text-faint sm:flex">
+            <span id="syncDot" class="dot tn-slate"></span>
+            <span id="syncText">Not synced</span>
+          </div>
+          <button id="themeBtn" class="ibtn" title="Toggle theme" aria-label="Toggle theme">
+            <svg data-i="moon" class="h-4 w-4 dark:hidden"></svg>
+            <svg data-i="sun" class="hidden h-4 w-4 dark:block"></svg>
+          </button>
+          <button id="refreshBtn" class="btn" title="Refresh data">
+            <svg data-i="refresh" class="h-3.5 w-3.5"></svg><span class="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="mx-auto w-full max-w-[1400px] flex-1 space-y-6 px-4 py-6 sm:px-6 lg:py-8">
+
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id="pageTitle" class="text-[22px] font-semibold tracking-tight">Daily Work Updates</h2>
+            <p id="pageDesc" class="mt-1 text-sm text-soft"></p>
+          </div>
+          <button id="exportBtn" class="btn"><svg data-i="download" class="h-3.5 w-3.5"></svg>Export CSV</button>
+        </div>
+
+        <!-- Metric cards -->
+        <section id="metrics" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"></section>
+
+        <!-- Data table -->
+        <section class="overflow-hidden rounded-xl border border-line bg-surface shadow-card">
+          <div class="flex flex-wrap items-center gap-3 border-b border-line p-3 sm:p-4">
+            <div class="relative min-w-[220px] max-w-md flex-1">
+              <svg data-i="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-faint"></svg>
+              <input id="search" type="search" placeholder="Search all columns…" autocomplete="off" spellcheck="false"
+                class="h-9 w-full rounded-lg border border-line bg-surface pl-9 pr-10 text-[13px] outline-none transition placeholder:text-faint focus:border-brand focus:ring-4 focus:ring-brand/15">
+              <span class="kbd pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2">/</span>
+            </div>
+            <div id="chips" class="flex flex-wrap items-center gap-1"></div>
+            <div id="resultCount" class="ml-auto text-xs tabular-nums text-faint"></div>
+          </div>
+
+          <div id="tableWrap" class="max-h-[68vh] min-h-[280px] overflow-auto">
+            <table id="table" class="data">
+              <thead id="thead"></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+            <div id="stateBox" class="hidden"></div>
+          </div>
+
+          <div id="pager" class="flex items-center justify-between gap-3 border-t border-line px-4 py-3 text-xs text-soft"></div>
+        </section>
+
+        <p class="pb-2 text-center text-xs text-faint">Data syncs live from Google Sheets · auto-refreshes every minute</p>
+      </main>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" class="pointer-events-none fixed bottom-4 right-4 z-[60] flex flex-col gap-2"></div>
+
+<script>
+/* ══════════════════════════ CONFIG ══════════════════════════ */
+
+// Publish each Google Sheet tab: File → Share → Publish to web → choose the tab → CSV.
+// Leave a URL empty ('') and that report shows a "connect a sheet" message.
+const SHEET_URLS = {
+  daily:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSjRsijk74NONtJhRXlaHDLZZh4kCAItsAUafu0dOc7mUbko3KYyTDMEHKTLgf0K_DyNBHOtvRbr4wL/pub?gid=1174347993&single=true&output=csv',
+  inward: '',
+  store:  '',
+  stock:  ''
+};
+
+const TABS = {
+  daily:  { label: 'Daily Work Updates', desc: 'Day-to-day tasks, owners and progress across the team.',        icon: 'clipboard' },
+  inward: { label: 'Inward Material',    desc: 'Material received at the store, with supplier and challan details.', icon: 'inbox' },
+  store:  { label: 'Store Issue Log',    desc: 'Items issued from the store to departments and jobs.',          icon: 'send' },
+  stock:  { label: 'Stock Register',     desc: 'Current stock levels and reorder alerts.',                      icon: 'layers' }
+};
+
+// SHA-256 of the PIN (default PIN is 1234 — change it!).
+// To make a new hash, open the browser console on this page and run:
+//   crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_PIN')).then(b => console.log([...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('')))
+const PIN_HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+const PIN_LENGTH = 4;
+const MAX_ATTEMPTS = 5;
+const LOCK_MS = 30000;
+const AUTO_REFRESH_MS = 60000;
+const PAGE_SIZE = 25;
+
+/* ══════════════════════════ HELPERS ══════════════════════════ */
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
+  sget: k => { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+  sset: (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) {} },
+  sdel: k => { try { sessionStorage.removeItem(k); } catch (e) {} }
+};
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const I = {
+  lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  shield: '<path d="M12 3 4 6v6c0 5 3.4 8.4 8 9.5 4.6-1.1 8-4.5 8-9.5V6z"/>',
+  panel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
+  refresh: '<path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12A9 9 0 0 1 18.5 5.8L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  download: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+  clipboard: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+  inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+  layers: '<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 12 10 5 10-5"/><path d="m2 17 10 5 10-5"/>',
+  up: '<path d="m18 15-6-6-6 6"/>',
+  down: '<path d="m6 9 6 6 6-6"/>',
+  updown: '<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  alert: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  activity: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  columns: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>'
+};
+const ic = (n, cls = 'h-4 w-4') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="${cls}" aria-hidden="true">${I[n] || ''}</svg>`;
+function hydrateIcons(root = document) {
+  root.querySelectorAll('svg[data-i]').forEach(el => {
+    el.setAttribute('viewBox', '0 0 24 24');
+    el.setAttribute('fill', 'none');
+    el.setAttribute('stroke', 'currentColor');
+    el.setAttribute('stroke-width', '1.8');
+    el.setAttribute('stroke-linecap', 'round');
+    el.setAttribute('stroke-linejoin', 'round');
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = I[el.dataset.i] || '';
+    el.removeAttribute('data-i');
+  });
+}
+
+/* ══════════════════════════ STATUS LOGIC ══════════════════════════ */
+
+const STATUS_MAP = {
+  done:     ['completed', 'complete', 'done', 'ok', 'closed', 'delivered', 'received', 'issued', 'approved', 'resolved', 'available'],
+  progress: ['in progress', 'inprogress', 'ongoing', 'processing', 'started', 'in transit', 'working', 'partially received'],
+  pending:  ['pending', 'waiting', 'waiting for delivery', 'open', 'not started', 'to do', 'todo', 'awaiting', 'scheduled'],
+  hold:     ['on hold', 'hold', 'paused', 'delayed'],
+  alert:    ['high', 'urgent', 'critical', 'rejected', 'cancelled', 'canceled', 'overdue', 'no reply from vendor', 'low stock', 'out of stock', 'failed', 'blocked']
+};
+const TONE = { done: 'green', progress: 'blue', pending: 'amber', hold: 'violet', alert: 'red' };
+const LOOKUP = {};
+Object.entries(STATUS_MAP).forEach(([k, arr]) => arr.forEach(s => { LOOKUP[s] = k; }));
+const norm = v => String(v ?? '').toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+const classify = v => { const n = norm(v); return n && Object.prototype.hasOwnProperty.call(LOOKUP, n) ? LOOKUP[n] : null; };
+const bucket = v => { const k = classify(v); return k === 'hold' ? 'pending' : k; };
+
+function detectStatusCol(rows, headers) {
+  const named = headers.find(h => /status/i.test(h));
+  if (named) return named;
+  let best = null, bestHits = 0;
+  headers.forEach(h => {
+    let n = 0, m = 0;
+    rows.forEach(r => { const v = String(r[h] ?? '').trim(); if (v) { n++; if (classify(v)) m++; } });
+    if (m >= 2 && n && m / n > 0.5 && m > bestHits) { best = h; bestHits = m; }
+  });
+  return best;
+}
+
+/* ══════════════════════════ STATE ══════════════════════════ */
+
+const state = {
+  authed: false, tab: 'daily', data: {}, loading: false, firstLoad: true,
+  query: '', filter: 'all', sort: { col: null, dir: 1 }, page: 1,
+  lastSync: null, view: [], animate: true
+};
+const cur = () => state.data[state.tab];
+
+/* ══════════════════════════ AUTH ══════════════════════════ */
+
+let pinBoxes = [];
+let checking = false;
+let lockTimer = null;
+
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+const lockRemaining = () => Math.max(0, (+store.get('ops_lock_until') || 0) - Date.now());
+
+function buildPinBoxes() {
+  const wrap = $('#pinWrap');
+  wrap.innerHTML = Array.from({ length: PIN_LENGTH }, (_, i) =>
+    `<input class="pin-box" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="Digit ${i + 1}">`
+  ).join('');
+  pinBoxes = [...wrap.querySelectorAll('.pin-box')];
+  pinBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      box.value = box.value.replace(/\D/g, '').slice(-1);
+      box.classList.toggle('filled', !!box.value);
+      clearPinError();
+      if (box.value && i < PIN_LENGTH - 1) pinBoxes[i + 1].focus();
+      if (pinBoxes.every(b => b.value)) submitPin();
+    });
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && i > 0) { pinBoxes[i - 1].value = ''; pinBoxes[i - 1].classList.remove('filled'); pinBoxes[i - 1].focus(); }
+      if (e.key === 'ArrowLeft' && i > 0) pinBoxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < PIN_LENGTH - 1) pinBoxes[i + 1].focus();
+    });
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const t = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, PIN_LENGTH);
+      t.split('').forEach((c, j) => { pinBoxes[j].value = c; pinBoxes[j].classList.add('filled'); });
+      pinBoxes[Math.min(t.length, PIN_LENGTH - 1)].focus();
+      if (t.length === PIN_LENGTH) submitPin();
+    });
+    box.addEventListener('focus', () => box.select());
+  });
+}
+
+function setPinMsg(text, cls) { const m = $('#pinMsg'); m.textContent = text; m.className = 'mt-4 h-5 text-center text-[13px] ' + (cls || ''); }
+function clearPinError() { pinBoxes.forEach(b => b.classList.remove('err')); if (!lockRemaining()) setPinMsg(''); }
+function resetPin(focus = true) { pinBoxes.forEach(b => { b.value = ''; b.classList.remove('filled', 'err'); }); if (focus && pinBoxes[0]) pinBoxes[0].focus(); }
+
+function startLockCountdown() {
+  clearInterval(lockTimer);
+  const tick = () => {
+    const left = lockRemaining();
+    if (left <= 0) {
+      clearInterval(lockTimer);
+      pinBoxes.forEach(b => { b.disabled = false; });
+      $('#pinBtn').disabled = false;
+      setPinMsg('');
+      resetPin();
+      return;
+    }
+    pinBoxes.forEach(b => { b.disabled = true; });
+    $('#pinBtn').disabled = true;
+    setPinMsg(`Too many attempts. Try again in ${Math.ceil(left / 1000)}s`, 'text-amber-500');
+  };
+  tick();
+  lockTimer = setInterval(tick, 500);
+}
+
+async function submitPin() {
+  if (checking || lockRemaining() > 0) return;
+  const pin = pinBoxes.map(b => b.value).join('');
+  if (pin.length < PIN_LENGTH) { setPinMsg(`Enter all ${PIN_LENGTH} digits`, 'text-soft'); return; }
+  checking = true;
+  let ok = false;
+  try {
+    ok = (await sha256(pin)) === PIN_HASH;
+  } catch (e) {
+    setPinMsg('Secure check unavailable — open over HTTPS or localhost', 'text-red-500');
+    checking = false; return;
+  }
+  checking = false;
+  if (ok) {
+    store.set('ops_attempts', '0');
+    store.sset('ops_session', PIN_HASH);
+    unlock();
+    return;
+  }
+  const attempts = (+store.get('ops_attempts') || 0) + 1;
+  pinBoxes.forEach(b => b.classList.add('err'));
+  const wrap = $('#pinWrap');
+  wrap.classList.remove('shake'); void wrap.offsetWidth; wrap.classList.add('shake');
+  if (attempts >= MAX_ATTEMPTS) {
+    store.set('ops_attempts', '0');
+    store.set('ops_lock_until', String(Date.now() + LOCK_MS));
+    setTimeout(() => { resetPin(false); startLockCountdown(); }, 350);
+  } else {
+    store.set('ops_attempts', String(attempts));
+    setPinMsg(`Incorrect PIN · ${MAX_ATTEMPTS - attempts} attempt${MAX_ATTEMPTS - attempts === 1 ? '' : 's'} left`, 'text-red-500');
+    setTimeout(() => resetPin(), 350);
+  }
+}
+
+function unlock() {
+  state.authed = true;
+  const login = $('#login');
+  login.classList.add('leaving');
+  setTimeout(() => login.classList.add('hidden'), 260);
+  $('#app').classList.remove('hidden');
+  startApp();
+}
+
+function lock() {
+  state.authed = false;
+  store.sdel('ops_session');
+  clearInterval(clockTimer); clearInterval(refreshTimer);
+  startedApp = false;
+  $('#app').classList.add('hidden');
+  $('#app').dataset.drawer = 'closed';
+  $('#tbody').innerHTML = ''; $('#thead').innerHTML = ''; $('#metrics').innerHTML = '';
+  state.data = {}; state.firstLoad = true;
+  const login = $('#login');
+  login.classList.remove('hidden');
+  void login.offsetWidth;
+  login.classList.remove('leaving');
+  resetPin(false); setPinMsg('');
+  if (lockRemaining() > 0) startLockCountdown(); else setTimeout(() => pinBoxes[0].focus(), 50);
+}
+
+/* ══════════════════════════ DATA LOADING ══════════════════════════ */
+
+function fetchSheet(key) {
+  const url = (SHEET_URLS[key] || '').trim();
+  if (!url) { state.data[key] = { rows: [], headers: [], statusCol: null, configured: false, error: null }; return Promise.resolve(); }
+  return new Promise(resolve => {
+    const bust = url + (url.includes('?') ? '&' : '?') + '_=' + Date.now();
+    Papa.parse(bust, {
+      download: true, header: true, skipEmptyLines: 'greedy',
+      complete: res => {
+        const headers = (res.meta.fields || []).map(h => (h || '').trim()).filter(Boolean);
+        if (headers.some(h => /<!doctype|<html/i.test(h))) {
+          state.data[key] = { rows: [], headers: [], statusCol: null, configured: true, error: 'The link returned a web page, not CSV. Re-publish the sheet tab as CSV and check the URL.' };
+          return resolve();
+        }
+        const rows = (res.data || []).filter(r => headers.some(h => String(r[h] ?? '').trim() !== ''));
+        state.data[key] = { rows, headers, statusCol: detectStatusCol(rows, headers), configured: true, error: null };
+        resolve();
+      },
+      error: err => {
+        state.data[key] = { rows: [], headers: [], statusCol: null, configured: true, error: 'Could not reach Google Sheets (' + (err && err.message ? err.message : 'network error') + ').' };
+        resolve();
+      }
+    });
+  });
+}
+
+async function loadAll(manual) {
+  if (state.loading) return;
+  state.loading = true;
+  $('#refreshBtn').classList.add('spinning');
+  $('#refreshBtn').disabled = true;
+  updateSync();
+  await Promise.all(Object.keys(SHEET_URLS).map(fetchSheet));
+  state.loading = false; state.firstLoad = false;
+  state.lastSync = new Date();
+  $('#refreshBtn').classList.remove('spinning');
+  $('#refreshBtn').disabled = false;
+  state.animate = true;
+  renderAll();
+  updateSync();
+  if (manual) {
+    const errs = Object.values(state.data).filter(d => d.error).length;
+    toast(errs ? 'Refreshed with errors' : 'Data refreshed', errs ? 'alert' : 'check');
+  }
+}
+
+/* ══════════════════════════ RENDERING ══════════════════════════ */
+
+function renderNav() {
+  $('#nav').innerHTML = Object.entries(TABS).map(([k, t]) =>
+    `<button class="nav-item ${state.tab === k ? 'active' : ''}" data-tab="${k}" data-tip="${esc(t.label)}">
+       ${ic(t.icon, 'h-[18px] w-[18px] shrink-0')}<span class="nav-label flex-1 text-left">${esc(t.label)}</span><span class="nav-count" id="count-${k}"></span>
+     </button>`).join('');
+  updateNavCounts();
+}
+function updateNavCounts() {
+  Object.keys(TABS).forEach(k => {
+    const el = $('#count-' + k); const d = state.data[k];
+    if (el) el.textContent = d && d.configured && !d.error ? d.rows.length : '';
+  });
+}
+
+function renderHeaderTitle() {
+  const t = TABS[state.tab];
+  $('#crumb').textContent = t.label;
+  $('#pageTitle').textContent = t.label;
+  $('#pageDesc').textContent = t.desc;
+}
+
+function countUp(el, to) {
+  if (reduceMotion || to === 0) { el.textContent = to.toLocaleString('en-IN'); return; }
+  const t0 = performance.now(), dur = 600;
+  (function f(t) {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(to * e).toLocaleString('en-IN');
+    if (p < 1) requestAnimationFrame(f);
+  })(t0);
+}
+
+function renderMetrics() {
+  const d = cur();
+  let cards;
+  const ready = d && d.configured && !d.error && !state.firstLoad;
+  if (!ready) {
+    const ph = (label, icon, tone) => ({ label, icon, tone, value: '—', badge: state.firstLoad ? 'Loading' : 'No data', sub: '' });
+    cards = [ph('Total Records', 'list', 'brand'), ph('Completed', 'check', 'green'), ph('In Progress', 'activity', 'blue'), ph('Pending', 'clock', 'amber')];
+  } else if (d.statusCol) {
+    const c = { done: 0, progress: 0, pending: 0, alert: 0 };
+    d.rows.forEach(r => { const b = bucket(r[d.statusCol]); if (b) c[b]++; });
+    const total = d.rows.length, pct = n => total ? Math.round(n / total * 100) : 0;
+    cards = [
+      { label: 'Total Records', icon: 'list', tone: 'brand', num: total, badge: d.headers.length + ' columns', sub: c.alert ? `${c.alert} need attention` : 'All clear' },
+      { label: 'Completed', icon: 'check', tone: 'green', num: c.done, badge: pct(c.done) + '%', pct: pct(c.done), sub: `of ${total.toLocaleString('en-IN')} records` },
+      { label: 'In Progress', icon: 'activity', tone: 'blue', num: c.progress, badge: pct(c.progress) + '%', pct: pct(c.progress), sub: `of ${total.toLocaleString('en-IN')} records` },
+      { label: 'Pending', icon: 'clock', tone: 'amber', num: c.pending, badge: pct(c.pending) + '%', pct: pct(c.pending), sub: `of ${total.toLocaleString('en-IN')} records` }
+    ];
+  } else {
+    const filled = d.rows.reduce((a, r) => a + d.headers.filter(h => String(r[h] ?? '').trim()).length, 0);
+    const cells = d.rows.length * d.headers.length;
+    cards = [
+      { label: 'Total Records', icon: 'list', tone: 'brand', num: d.rows.length, badge: 'Live', sub: 'Rows in this sheet' },
+      { label: 'Columns', icon: 'columns', tone: 'blue', num: d.headers.length, badge: 'Schema', sub: 'Detected from row 1' },
+      { label: 'Completeness', icon: 'check', tone: 'green', value: cells ? Math.round(filled / cells * 100) + '%' : '—', badge: 'Filled', pct: cells ? Math.round(filled / cells * 100) : 0, sub: 'Non-empty cells' },
+      { label: 'Last Sync', icon: 'clock', tone: 'amber', value: state.lastSync ? state.lastSync.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—', badge: 'Auto', sub: 'Refreshes every minute' }
+    ];
+  }
+
+  $('#metrics').innerHTML = cards.map(c => `
+    <div class="tn-${c.tone} rounded-xl border border-line bg-surface p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-pop ${state.animate ? 'row-in' : ''}">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <span class="tint grid h-8 w-8 place-items-center rounded-lg">${ic(c.icon)}</span>
+          <span class="text-[13px] font-medium text-soft">${c.label}</span>
+        </div>
+        <span class="badge tint nodot text-[11px]">${esc(c.badge)}</span>
+      </div>
+      <div class="mt-4 text-[30px] font-semibold leading-none tracking-tight tabular-nums" ${c.num != null ? `data-count="${c.num}"` : ''}>${c.num != null ? 0 : esc(c.value)}</div>
+      ${c.pct != null ? `<div class="mt-3 h-1 overflow-hidden rounded-full bg-sunken"><div class="bar h-full rounded-full transition-[width] duration-700 ease-out" data-w="${c.pct}" style="width:0;background:var(--fg)"></div></div>` : '<div class="mt-3 h-1"></div>'}
+      <p class="mt-2 text-xs text-faint">${esc(c.sub || '')}</p>
+    </div>`).join('');
+
+  $('#metrics').querySelectorAll('[data-count]').forEach(el => countUp(el, +el.dataset.count));
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $('#metrics').querySelectorAll('.bar').forEach(b => { b.style.width = b.dataset.w + '%'; });
+  }));
+}
+
+function renderChips() {
+  const d = cur(), box = $('#chips');
+  if (!d || !d.statusCol || !d.rows.length) { box.innerHTML = ''; return; }
+  const counts = { all: d.rows.length, done: 0, progress: 0, pending: 0, alert: 0 };
+  d.rows.forEach(r => { const b = bucket(r[d.statusCol]); if (b) counts[b]++; });
+  const defs = [['all', 'All'], ['done', 'Completed'], ['progress', 'In Progress'], ['pending', 'Pending'], ['alert', 'Attention']]
+    .filter(([k]) => k === 'all' || counts[k] > 0);
+  box.innerHTML = defs.map(([k, l]) =>
+    `<button class="chip ${state.filter === k ? 'on' : ''}" data-f="${k}">${k !== 'all' ? `<span class="dot tn-${TONE[k]}"></span>` : ''}${l}<span class="tabular-nums text-faint">${counts[k]}</span></button>`
+  ).join('');
+}
+
+function sortKey(v) {
+  const s = String(v ?? '').trim();
+  if (!s) return { e: true, t: 's', v: '' };
+  if (/^[-+]?\d[\d,]*\.?\d*$/.test(s)) return { t: 'n', v: parseFloat(s.replace(/,/g, '')) };
+  const m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/); // DD/MM/YYYY
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; return { t: 'n', v: new Date(y, +m[2] - 1, +m[1]).getTime() }; }
+  const p = Date.parse(s);
+  if (!isNaN(p) && /\d{4}/.test(s)) return { t: 'n', v: p };
+  return { t: 's', v: s.toLowerCase() };
+}
+
+function computeView() {
+  const d = cur();
+  if (!d) { state.view = []; return; }
+  let rows = d.rows;
+  if (state.filter !== 'all' && d.statusCol) rows = rows.filter(r => bucket(r[d.statusCol]) === state.filter);
+  const q = state.query.trim().toLowerCase();
+  if (q) rows = rows.filter(r => d.headers.some(h => String(r[h] ?? '').toLowerCase().includes(q)));
+  if (state.sort.col != null) {
+    const h = d.headers[state.sort.col], dir = state.sort.dir;
+    rows = rows.map((r, i) => [r, i, sortKey(r[h])]).sort((a, b) => {
+      const x = a[2], y = b[2];
+      if (x.e || y.e) return x.e === y.e ? a[1] - b[1] : (x.e ? 1 : -1);
+      const c = (x.t === 'n' && y.t === 'n') ? x.v - y.v : String(x.v).localeCompare(String(y.v), undefined, { numeric: true });
+      return c * dir || a[1] - b[1];
+    }).map(a => a[0]);
+  }
+  state.view = rows;
+}
+
+function hl(text, q) {
+  const s = String(text ?? '');
+  if (!q) return esc(s);
+  const l = s.toLowerCase();
+  let i = 0, out = '', idx;
+  while ((idx = l.indexOf(q, i)) !== -1) {
+    out += esc(s.slice(i, idx)) + '<mark>' + esc(s.slice(idx, idx + q.length)) + '</mark>';
+    i = idx + q.length;
+  }
+  return out + esc(s.slice(i));
+}
+function cell(v, q) {
+  const s = String(v ?? '').trim();
+  if (!s) return '<span class="text-faint">—</span>';
+  const k = classify(s);
+  return k ? `<span class="badge tint tn-${TONE[k]}">${hl(s, q)}</span>` : hl(s, q);
+}
+
+function stateBox(icon, title, text, action = '') {
+  return `<div class="grid place-items-center px-6 py-16 text-center">
+    <div class="grid h-11 w-11 place-items-center rounded-xl border border-line bg-sunken text-soft">${ic(icon, 'h-5 w-5')}</div>
+    <h3 class="mt-4 text-sm font-semibold">${title}</h3>
+    <p class="mt-1 max-w-sm text-[13px] leading-relaxed text-soft">${text}</p>${action}</div>`;
+}
+function showState(html) {
+  $('#table').classList.add('hidden');
+  const b = $('#stateBox'); b.classList.remove('hidden'); b.innerHTML = html;
+}
+function showTable() { $('#table').classList.remove('hidden'); $('#stateBox').classList.add('hidden'); }
+
+function renderTable() {
+  const d = cur(), pager = $('#pager'), count = $('#resultCount');
+  pager.innerHTML = ''; count.textContent = '';
+
+  if (state.firstLoad || !d) {
+    showState(`<div class="space-y-3 p-5">${Array.from({ length: 7 }, (_, i) => `<div class="sk h-9" style="opacity:${1 - i * .1}"></div>`).join('')}</div>`);
+    return;
+  }
+  if (!d.configured) {
+    showState(stateBox('link', 'No sheet connected', `Paste the published CSV link into <code class="rounded bg-sunken px-1.5 py-0.5 font-mono text-xs">SHEET_URLS.${state.tab}</code> at the top of this file to see this report.`));
+    return;
+  }
+  if (d.error) {
+    showState(stateBox('alert', 'Couldn’t load this report', esc(d.error), `<button class="btn mt-5" onclick="loadAll(true)">${ic('refresh', 'h-3.5 w-3.5')}Try again</button>`));
+    return;
+  }
+  if (!d.rows.length) {
+    showState(stateBox('database', 'This sheet is empty', 'Add rows under the header row in Google Sheets, then hit Refresh.'));
+    return;
+  }
+
+  computeView();
+  const total = d.rows.length, n = state.view.length, q = state.query.trim().toLowerCase();
+  count.textContent = n === total ? `${total.toLocaleString('en-IN')} records` : `${n.toLocaleString('en-IN')} of ${total.toLocaleString('en-IN')} records`;
+
+  if (!n) {
+    showState(stateBox('search', 'No matching records', 'Try a different search term or clear the filters.', `<button class="btn mt-5" onclick="clearFilters()">${ic('x', 'h-3.5 w-3.5')}Clear filters</button>`));
+    return;
+  }
+  showTable();
+
+  const pages = Math.max(1, Math.ceil(n / PAGE_SIZE));
+  if (state.page > pages) state.page = pages;
+  const start = (state.page - 1) * PAGE_SIZE, slice = state.view.slice(start, start + PAGE_SIZE);
+
+  $('#thead').innerHTML = '<tr>' + d.headers.map((h, i) => {
+    const on = state.sort.col === i;
+    return `<th data-c="${i}" aria-sort="${on ? (state.sort.dir === 1 ? 'ascending' : 'descending') : 'none'}">${esc(h)}<span class="sort ${on ? 'on' : ''}">${ic(on ? (state.sort.dir === 1 ? 'up' : 'down') : 'updown', 'h-3 w-3')}</span></th>`;
+  }).join('') + '</tr>';
+
+  $('#tbody').innerHTML = slice.map(r =>
+    `<tr class="${state.animate ? 'row-in' : ''}">` + d.headers.map((h, ci) =>
+      `<td class="${ci === 0 ? 'font-medium text-ink' : 'text-soft'}">${cell(r[h], q)}</td>`).join('') + '</tr>'
+  ).join('');
+  state.animate = false;
+
+  const from = start + 1, to = Math.min(start + PAGE_SIZE, n);
+  pager.innerHTML = `
+    <span class="tabular-nums">Showing ${from.toLocaleString('en-IN')}–${to.toLocaleString('en-IN')} of ${n.toLocaleString('en-IN')}</span>
+    <div class="flex items-center gap-2">
+      <span class="tabular-nums text-faint">Page ${state.page} / ${pages}</span>
+      <button class="btn" data-p="prev" ${state.page <= 1 ? 'disabled' : ''}>Previous</button>
+      <button class="btn" data-p="next" ${state.page >= pages ? 'disabled' : ''}>Next</button>
+    </div>`;
+}
+
+function renderAll() {
+  renderNav(); renderHeaderTitle(); renderMetrics(); renderChips(); renderTable();
+}
+
+function clearFilters() {
+  state.query = ''; state.filter = 'all'; state.page = 1; $('#search').value = '';
+  renderChips(); renderTable();
+}
+
+/* ══════════════════════════ ACTIONS ══════════════════════════ */
+
+function setTab(key) {
+  if (key === state.tab) { closeDrawer(); return; }
+  state.tab = key; state.query = ''; state.filter = 'all'; state.page = 1; state.sort = { col: null, dir: 1 }; state.animate = true;
+  $('#search').value = '';
+  renderAll(); closeDrawer();
+}
+
+function exportCsv() {
+  const d = cur();
+  if (!d || !d.rows.length) { toast('Nothing to export', 'alert'); return; }
+  const csv = Papa.unparse({ fields: d.headers, data: state.view.map(r => d.headers.map(h => r[h] ?? '')) });
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${state.tab}-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`Exported ${state.view.length} rows`, 'check');
+}
+
+function toast(msg, icon = 'check') {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = ic(icon, 'h-4 w-4') + '<span>' + esc(msg) + '</span>';
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 260); }, 2600);
+}
+
+/* Sidebar */
+const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+function toggleSidebar() {
+  const app = $('#app');
+  if (isDesktop()) {
+    const c = app.dataset.collapsed !== 'true';
+    app.dataset.collapsed = String(c);
+    store.set('ops_sidebar', c ? '1' : '0');
+  } else {
+    app.dataset.drawer = app.dataset.drawer === 'open' ? 'closed' : 'open';
+  }
+}
+function closeDrawer() { $('#app').dataset.drawer = 'closed'; }
+
+/* Clock + sync status */
+let clockTimer = null, refreshTimer = null, startedApp = false;
+function tickClock() {
+  const now = new Date();
+  $('#clockDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' });
+  $('#clockTime').textContent = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  updateSync();
+}
+function updateSync() {
+  const dot = $('#syncDot'), txt = $('#syncText');
+  const hasErr = Object.values(state.data).some(d => d.error);
+  let label, tone;
+  if (state.loading) { label = 'Syncing…'; tone = 'amber'; }
+  else if (!state.lastSync) { label = 'Not synced'; tone = 'slate'; }
+  else {
+    const s = Math.floor((Date.now() - state.lastSync) / 1000), m = Math.floor(s / 60);
+    label = s < 10 ? 'Synced just now' : s < 60 ? `Synced ${s}s ago` : m < 60 ? `Synced ${m}m ago` : `Synced ${Math.floor(m / 60)}h ago`;
+    tone = hasErr ? 'red' : 'green';
+  }
+  txt.textContent = label;
+  dot.className = `dot tn-${tone} ${state.loading ? 'pulse' : ''}`;
+}
+
+function startApp() {
+  if (startedApp) return;
+  startedApp = true;
+  $('#app').dataset.collapsed = store.get('ops_sidebar') === '1' ? 'true' : 'false';
+  state.animate = true;
+  renderAll();
+  tickClock();
+  clockTimer = setInterval(tickClock, 1000);
+  refreshTimer = setInterval(() => { if (state.authed && document.visibilityState === 'visible') loadAll(false); }, AUTO_REFRESH_MS);
+  loadAll(false);
+}
+
+/* ══════════════════════════ WIRING ══════════════════════════ */
+
+hydrateIcons();
+buildPinBoxes();
+
+$('#pinForm').addEventListener('submit', e => { e.preventDefault(); submitPin(); });
+$('#logoutBtn').addEventListener('click', lock);
+$('#sidebarToggle').addEventListener('click', toggleSidebar);
+$('#scrim').addEventListener('click', closeDrawer);
+$('#refreshBtn').addEventListener('click', () => loadAll(true));
+$('#exportBtn').addEventListener('click', exportCsv);
+$('#themeBtn').addEventListener('click', () => {
+  const dark = document.documentElement.classList.toggle('dark');
+  store.set('ops_theme', dark ? 'dark' : 'light');
+});
+$('#nav').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
+$('#chips').addEventListener('click', e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  state.filter = b.dataset.f; state.page = 1; renderChips(); renderTable();
+});
+$('#thead').addEventListener('click', e => {
+  const th = e.target.closest('th[data-c]'); if (!th) return;
+  const c = +th.dataset.c;
+  if (state.sort.col !== c) state.sort = { col: c, dir: 1 };
+  else if (state.sort.dir === 1) state.sort.dir = -1;
+  else state.sort = { col: null, dir: 1 };
+  state.page = 1; renderTable();
+});
+$('#pager').addEventListener('click', e => {
+  const b = e.target.closest('[data-p]'); if (!b) return;
+  state.page += b.dataset.p === 'next' ? 1 : -1;
+  renderTable();
+  $('#tableWrap').scrollTop = 0;
+});
+$('#search').addEventListener('input', e => { state.query = e.target.value; state.page = 1; renderTable(); });
+
+document.addEventListener('keydown', e => {
+  if (!state.authed) return;
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if ((e.key === '/' && !typing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
+    e.preventDefault(); $('#search').focus(); $('#search').select();
+  } else if (e.key === 'Escape') {
+    if (document.activeElement === $('#search')) { $('#search').value = ''; state.query = ''; state.page = 1; renderTable(); $('#search').blur(); }
+    else closeDrawer();
+  }
+});
+window.matchMedia('(min-width: 1024px)').addEventListener('change', closeDrawer);
+
+/* Boot: restore session or ask for PIN */
+if (store.sget('ops_session') === PIN_HASH) {
+  $('#login').classList.add('hidden');
+  state.authed = true;
+  $('#app').classList.remove('hidden');
+  startApp();
+} else if (lockRemaining() > 0) {
+  startLockCountdown();
+} else {
+  setTimeout(() => pinBoxes[0].focus(), 80);
+}
+</script>
+</body>
+</html>
