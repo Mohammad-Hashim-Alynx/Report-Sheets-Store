@@ -376,17 +376,39 @@
 // Publish each Google Sheet tab: File → Share → Publish to web → choose the tab → CSV.
 // Leave a URL empty ('') and that report shows a "connect a sheet" message.
 const SHEET_URLS = {
-  daily:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSjRsijk74NONtJhRXlaHDLZZh4kCAItsAUafu0dOc7mUbko3KYyTDMEHKTLgf0K_DyNBHOtvRbr4wL/pub?gid=1174347993&single=true&output=csv',
-  inward: '',
-  store:  '',
-  stock:  ''
+  daily:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=0&single=true&output=csv',
+  process:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=154235953&single=true&output=csv',
+  cutting:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1113602434&single=true&output=csv',
+  stock:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1&single=true&output=csv',
+  inward:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=2&single=true&output=csv',
+  issue:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=3&single=true&output=csv',
+  toolbuy:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=5&single=true&output=csv',
+  consumables:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=6&single=true&output=csv',
+  inserts:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=199450532&single=true&output=csv',
+  scrap:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=7&single=true&output=csv',
+  physical:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=8&single=true&output=csv',
+  vendors:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1209421226&single=true&output=csv',
+  spares:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1488564858&single=true&output=csv',
+  calibration:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=221320726&single=true&output=csv',
+  locations:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=474953076&single=true&output=csv'
 };
 
 const TABS = {
-  daily:  { label: 'Daily Work Updates', desc: 'Day-to-day tasks, owners and progress across the team.',            icon: 'clipboard' },
-  inward: { label: 'Inward Material',    desc: 'Material received at the store, with supplier and challan details.', icon: 'inbox' },
-  store:  { label: 'Store Issue Log',    desc: 'Items issued from the store to departments and jobs.',               icon: 'send' },
-  stock:  { label: 'Stock Register',     desc: 'Current stock levels and reorder alerts.',                           icon: 'layers' }
+  daily:       { label: 'Daily Reports', desc: 'Daily operational reports and recorded updates.', icon: 'clipboard' },
+  process:     { label: 'Process Report', desc: 'Process-level production reporting and status.', icon: 'activity' },
+  cutting:     { label: 'Raw Material Cutting', desc: 'Raw material cutting records and production quantities.', icon: 'columns' },
+  stock:       { label: 'Stock Master', desc: 'Stock master records and current material details.', icon: 'layers' },
+  inward:      { label: 'Inward / GRN', desc: 'Material receipts and goods receipt note records.', icon: 'inbox' },
+  issue:       { label: 'Material Issue Register', desc: 'Material issued to jobs, machines or departments.', icon: 'send' },
+  toolbuy:     { label: 'Detailed Tool Purchase List', desc: 'Detailed tooling purchase records and requirements.', icon: 'list' },
+  consumables: { label: 'Consumables', desc: 'Consumable items and their recorded details.', icon: 'database' },
+  inserts:     { label: 'Inserts Catalogue', desc: 'Catalogue of cutting inserts and related details.', icon: 'layers' },
+  scrap:       { label: 'Scrap and Rejection', desc: 'Scrap, rejected material and rejection records.', icon: 'alert' },
+  physical:    { label: 'Physical Stock Verification', desc: 'Physical stock verification and reconciliation records.', icon: 'check' },
+  vendors:     { label: 'Vendor Master', desc: 'Vendor master data and supplier details.', icon: 'list' },
+  spares:      { label: 'Machine Spare Parts', desc: 'Spare parts for machines and maintenance reference.', icon: 'database' },
+  calibration: { label: 'Tool Calibration History', desc: 'Tool calibration records and certificate history.', icon: 'check' },
+  locations:   { label: 'Location Master', desc: 'Store, rack and material location master records.', icon: 'columns' }
 };
 
 // SHA-256 hash for the dashboard password. NOTE: client-side checks are not secure
