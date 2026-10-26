@@ -113,6 +113,12 @@
   #sidebar { width:264px; background:linear-gradient(180deg,#1a1c4b 0%,#14163c 100%); color:#fff; transition: width .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1); }
   .dark #sidebar { background:linear-gradient(180deg,#14163c 0%,#0c0e2a 100%); border-right:1px solid rgb(var(--line)); }
   .side-sep { border-color: rgba(255,255,255,.09); }
+  /* Scroll the report list independently while keeping the sidebar header/footer fixed. */
+  #sidebar nav { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.28) transparent; }
+  #sidebar nav::-webkit-scrollbar { width: 6px; }
+  #sidebar nav::-webkit-scrollbar-track { background: transparent; }
+  #sidebar nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.24); border-radius: 999px; }
+  #sidebar nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
   .nav-item { display:flex; align-items:center; gap:11px; width:100%; position:relative; padding:9px 10px; border-radius:8px; font-size:13.5px; font-weight:500; color:rgba(255,255,255,.66); transition: background .15s, color .15s; white-space:nowrap; }
   .nav-item:hover { background: rgba(255,255,255,.07); color:#fff; }
   .nav-item.active { background: rgba(255,255,255,.11); color:#fff; }
@@ -267,7 +273,7 @@
         </div>
       </div>
 
-      <nav class="flex-1 px-3 py-5">
+      <nav class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5" aria-label="Dashboard reports">
         <div class="brand-text mb-2 px-2.5 text-[10.5px] font-semibold uppercase tracking-[.14em] text-white/40">Reports</div>
         <div id="nav" class="space-y-0.5"></div>
       </nav>
@@ -390,7 +396,10 @@ const SHEET_URLS = {
   vendors:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1209421226&single=true&output=csv',
   spares:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1488564858&single=true&output=csv',
   calibration:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=221320726&single=true&output=csv',
-  locations:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=474953076&single=true&output=csv'
+  locations:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=474953076&single=true&output=csv',
+  damaged:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1923538532&single=true&output=csv',
+  gas:        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=600886454&single=true&output=csv',
+  requests:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1768208708&single=true&output=csv'
 };
 
 const TABS = {
@@ -408,7 +417,10 @@ const TABS = {
   vendors:     { label: 'Vendor Master', desc: 'Vendor master data and supplier details.', icon: 'list' },
   spares:      { label: 'Machine Spare Parts', desc: 'Spare parts for machines and maintenance reference.', icon: 'database' },
   calibration: { label: 'Tool Calibration History', desc: 'Tool calibration records and certificate history.', icon: 'check' },
-  locations:   { label: 'Location Master', desc: 'Store, rack and material location master records.', icon: 'columns' }
+  locations:   { label: 'Location Master', desc: 'Store, rack and material location master records.', icon: 'columns' },
+  damaged:     { label: 'Broken/Damaged Item Report', desc: 'Records of broken, damaged and unusable items.', icon: 'alert' },
+  gas:         { label: 'Gas Record', desc: 'Gas cylinder usage, receipt and related records.', icon: 'database' },
+  requests:    { label: 'Requests and Problems', desc: 'Store requests, reported problems and follow-up status.', icon: 'clipboard' }
 };
 
 // SHA-256 hash for the dashboard password. NOTE: client-side checks are not secure
