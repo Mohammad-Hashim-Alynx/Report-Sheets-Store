@@ -113,12 +113,6 @@
   #sidebar { width:264px; background:linear-gradient(180deg,#1a1c4b 0%,#14163c 100%); color:#fff; transition: width .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1); }
   .dark #sidebar { background:linear-gradient(180deg,#14163c 0%,#0c0e2a 100%); border-right:1px solid rgb(var(--line)); }
   .side-sep { border-color: rgba(255,255,255,.09); }
-  /* Scroll the report list independently while keeping the sidebar header/footer fixed. */
-  #sidebar nav { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.28) transparent; }
-  #sidebar nav::-webkit-scrollbar { width: 6px; }
-  #sidebar nav::-webkit-scrollbar-track { background: transparent; }
-  #sidebar nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.24); border-radius: 999px; }
-  #sidebar nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.42); }
   .nav-item { display:flex; align-items:center; gap:11px; width:100%; position:relative; padding:9px 10px; border-radius:8px; font-size:13.5px; font-weight:500; color:rgba(255,255,255,.66); transition: background .15s, color .15s; white-space:nowrap; }
   .nav-item:hover { background: rgba(255,255,255,.07); color:#fff; }
   .nav-item.active { background: rgba(255,255,255,.11); color:#fff; }
@@ -213,9 +207,35 @@
 <!-- ═════════════════════════ SIGN-IN ═════════════════════════ -->
 <div id="login" class="fixed inset-0 z-50 grid bg-surface lg:grid-cols-[1.05fr_1fr]">
 
+  <!-- Brand panel (desktop) -->
+  <div class="login-hero relative hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex">
+    <div class="hero-grid pointer-events-none absolute inset-0"></div>
+    <div class="relative flex items-center gap-3">
+      <div class="logo-tile h-11 w-11"><img data-logo alt="GIGA DYNAMICS logo"></div>
+      <div class="text-[15px] font-semibold tracking-[.14em]">GIGA DYNAMICS</div>
+    </div>
+
+    <div class="relative max-w-md">
+      <h1 class="text-[38px] font-semibold leading-[1.1] tracking-tight">Live Dashboard</h1>
+      <p class="mt-4 text-[15px] leading-relaxed text-white/70">Real-time visibility into daily operations, inward material, store issues and stock levels — straight from your live data sheets.</p>
+      <ul class="mt-8 space-y-3 text-sm text-white/85">
+        <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>Daily work updates and task status</li>
+        <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>Inward material and store issue logs</li>
+        <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>Stock register with automatic alerts</li>
+      </ul>
+    </div>
+
+    <div class="relative text-xs text-white/45">© <span data-year></span> GIGA DYNAMICS. Confidential — authorised personnel only.</div>
+  </div>
+
   <!-- Form panel -->
   <div class="relative grid place-items-center p-6">
     <div class="login-card w-full max-w-[380px]">
+      <div class="mb-8 flex items-center gap-3 lg:hidden">
+        <div class="logo-tile h-11 w-11 border border-line"><img data-logo alt="GIGA DYNAMICS logo"></div>
+        <div class="leading-tight"><div class="text-[15px] font-semibold tracking-[.12em]">GIGA DYNAMICS</div><div class="text-xs text-soft">Live Dashboard</div></div>
+      </div>
+
       <h2 class="text-2xl font-semibold tracking-tight">Sign in</h2>
       <p class="mt-1.5 text-sm text-soft">Enter your access PIN to open the live dashboard.</p>
 
@@ -226,6 +246,7 @@
         <button id="pinBtn" type="submit" class="btn btn-primary mt-2 !h-11 w-full !text-sm">Sign in</button>
       </form>
 
+      <p class="mt-6 flex items-center gap-1.5 text-xs text-faint"><svg data-i="lock" class="h-3.5 w-3.5"></svg>Secure session · ends when this tab is closed</p>
     </div>
   </div>
 </div>
@@ -242,15 +263,22 @@
         <div class="logo-tile h-9 w-9"><img data-logo alt="GIGA DYNAMICS logo"></div>
         <div class="brand-text min-w-0 leading-tight">
           <div class="truncate text-[13.5px] font-semibold tracking-[.12em]">GIGA DYNAMICS</div>
+          <div class="text-[11px] font-medium text-brand">Live Dashboard</div>
         </div>
       </div>
 
-      <nav class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5" aria-label="Dashboard reports">
+      <nav class="flex-1 px-3 py-5">
+        <div class="brand-text mb-2 px-2.5 text-[10.5px] font-semibold uppercase tracking-[.14em] text-white/40">Reports</div>
         <div id="nav" class="space-y-0.5"></div>
       </nav>
 
       <div class="side-sep border-t p-3">
-        <div class="flex justify-end">
+        <div class="user-row flex items-center gap-2.5">
+          <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-bold text-white">GD</div>
+          <div class="user-text min-w-0 flex-1 leading-tight">
+            <div class="truncate text-[13px] font-medium">Administrator</div>
+            <div class="truncate text-[11px] text-white/50">Management access</div>
+          </div>
           <button id="logoutBtn" class="grid h-8 w-8 place-items-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-white" title="Lock dashboard" aria-label="Lock dashboard"><svg data-i="logout" class="h-4 w-4"></svg></button>
         </div>
       </div>
@@ -263,8 +291,11 @@
       <header class="sticky top-0 z-20 flex h-[60px] items-center gap-3 border-b border-t-[3px] border-line border-t-brand bg-surface px-4 sm:px-6">
         <button id="sidebarToggle" class="ibtn -ml-1" title="Toggle sidebar" aria-label="Toggle sidebar"><svg data-i="panel" class="h-[18px] w-[18px]"></svg></button>
         <div class="hidden h-5 w-px bg-line sm:block"></div>
-        <div class="flex min-w-0 items-center text-[13px]">
-          <span id="crumb" class="truncate font-semibold text-ink">Daily Reports</span>
+        <div class="flex min-w-0 items-center gap-2 text-[13px]">
+          <span class="hidden sm:inline-flex items-center gap-2 font-semibold tracking-wide"><img data-logo alt="GIGA DYNAMICS logo" class="h-6 w-6 rounded-md bg-white object-contain p-0.5">GIGA DYNAMICS</span>
+          <span class="hidden text-soft sm:inline">Live Dashboard</span>
+          <span class="hidden text-faint sm:inline">/</span>
+          <span id="crumb" class="truncate font-medium text-soft">Daily Work Updates</span>
         </div>
 
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
@@ -291,6 +322,13 @@
         <div class="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="pageTitle" class="text-2xl font-semibold tracking-tight">Daily Work Updates</h2>
+            <p id="pageDesc" class="mt-1 text-sm text-soft"></p>
+          </div>
+          <div class="flex items-center gap-2.5 rounded-md border border-line bg-surface px-3 py-1.5 text-xs text-soft shadow-card">
+            <span id="syncDot" class="dot tn-slate"></span>
+            <span id="syncText" class="font-medium text-ink">Not synced</span>
+            <span class="text-line">|</span>
+            <span id="lastUpdated" class="tabular-nums">—</span>
           </div>
         </div>
 
@@ -321,6 +359,10 @@
           <div id="pager" class="flex items-center justify-between gap-3 border-t border-line px-4 py-3 text-xs text-soft"></div>
         </section>
 
+        <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-5 text-xs text-faint">
+          <span>© <span data-year></span> GIGA DYNAMICS. All rights reserved.</span>
+          <span>Live data from Google Sheets · refreshes every minute · Internal use only</span>
+        </footer>
       </main>
     </div>
   </div>
@@ -334,45 +376,17 @@
 // Publish each Google Sheet tab: File → Share → Publish to web → choose the tab → CSV.
 // Leave a URL empty ('') and that report shows a "connect a sheet" message.
 const SHEET_URLS = {
-  daily:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=0&single=true&output=csv',
-  process:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=154235953&single=true&output=csv',
-  cutting:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1113602434&single=true&output=csv',
-  stock:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1&single=true&output=csv',
-  inward:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=2&single=true&output=csv',
-  issue:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=3&single=true&output=csv',
-  toolbuy:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=5&single=true&output=csv',
-  consumables:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=6&single=true&output=csv',
-  inserts:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=199450532&single=true&output=csv',
-  scrap:      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=7&single=true&output=csv',
-  physical:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=8&single=true&output=csv',
-  vendors:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1209421226&single=true&output=csv',
-  spares:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1488564858&single=true&output=csv',
-  calibration:'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=221320726&single=true&output=csv',
-  locations:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=474953076&single=true&output=csv',
-  damaged:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1923538532&single=true&output=csv',
-  gas:        'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=600886454&single=true&output=csv',
-  requests:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1768208708&single=true&output=csv'
+  daily:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSjRsijk74NONtJhRXlaHDLZZh4kCAItsAUafu0dOc7mUbko3KYyTDMEHKTLgf0K_DyNBHOtvRbr4wL/pub?gid=1174347993&single=true&output=csv',
+  inward: '',
+  store:  '',
+  stock:  ''
 };
 
 const TABS = {
-  daily:       { label: 'Daily Reports', desc: 'Daily operational reports and recorded updates.', icon: 'clipboard' },
-  process:     { label: 'Process Report', desc: 'Process-level production reporting and status.', icon: 'activity' },
-  cutting:     { label: 'Raw Material Cutting', desc: 'Raw material cutting records and production quantities.', icon: 'columns' },
-  stock:       { label: 'Stock Master', desc: 'Stock master records and current material details.', icon: 'layers' },
-  inward:      { label: 'Inward / GRN', desc: 'Material receipts and goods receipt note records.', icon: 'inbox' },
-  issue:       { label: 'Material Issue Register', desc: 'Material issued to jobs, machines or departments.', icon: 'send' },
-  toolbuy:     { label: 'Detailed Tool Purchase List', desc: 'Detailed tooling purchase records and requirements.', icon: 'list' },
-  consumables: { label: 'Consumables', desc: 'Consumable items and their recorded details.', icon: 'database' },
-  inserts:     { label: 'Inserts Catalogue', desc: 'Catalogue of cutting inserts and related details.', icon: 'layers' },
-  scrap:       { label: 'Scrap and Rejection', desc: 'Scrap, rejected material and rejection records.', icon: 'alert' },
-  physical:    { label: 'Physical Stock Verification', desc: 'Physical stock verification and reconciliation records.', icon: 'check' },
-  vendors:     { label: 'Vendor Master', desc: 'Vendor master data and supplier details.', icon: 'list' },
-  spares:      { label: 'Machine Spare Parts', desc: 'Spare parts for machines and maintenance reference.', icon: 'database' },
-  calibration: { label: 'Tool Calibration History', desc: 'Tool calibration records and certificate history.', icon: 'check' },
-  locations:   { label: 'Location Master', desc: 'Store, rack and material location master records.', icon: 'columns' },
-  damaged:     { label: 'Broken/Damaged Item Report', desc: 'Records of broken, damaged and unusable items.', icon: 'alert' },
-  gas:         { label: 'Gas Record', desc: 'Gas cylinder usage, receipt and related records.', icon: 'database' },
-  requests:    { label: 'Requests and Problems', desc: 'Store requests, reported problems and follow-up status.', icon: 'clipboard' }
+  daily:  { label: 'Daily Work Updates', desc: 'Day-to-day tasks, owners and progress across the team.',            icon: 'clipboard' },
+  inward: { label: 'Inward Material',    desc: 'Material received at the store, with supplier and challan details.', icon: 'inbox' },
+  store:  { label: 'Store Issue Log',    desc: 'Items issued from the store to departments and jobs.',               icon: 'send' },
+  stock:  { label: 'Stock Register',     desc: 'Current stock levels and reorder alerts.',                           icon: 'layers' }
 };
 
 // SHA-256 hash for the dashboard password. NOTE: client-side checks are not secure
@@ -701,18 +715,22 @@ async function loadAll(manual) {
 function renderNav() {
   $('#nav').innerHTML = Object.entries(TABS).map(([k, t]) =>
     `<button class="nav-item ${state.tab === k ? 'active' : ''}" data-tab="${k}" data-tip="${esc(t.label)}">
-       ${ic(t.icon, 'h-[18px] w-[18px] shrink-0')}<span class="nav-label flex-1 text-left">${esc(t.label)}</span>
+       ${ic(t.icon, 'h-[18px] w-[18px] shrink-0')}<span class="nav-label flex-1 text-left">${esc(t.label)}</span><span class="nav-count" id="count-${k}"></span>
      </button>`).join('');
   updateNavCounts();
 }
 function updateNavCounts() {
-  // Entry counts are shown in the page's top metric cards, not beside sidebar names.
+  Object.keys(TABS).forEach(k => {
+    const el = $('#count-' + k); const d = state.data[k];
+    if (el) el.textContent = d && d.configured && !d.error ? d.rows.length : '';
+  });
 }
 
 function renderHeaderTitle() {
   const t = TABS[state.tab];
-  const crumb = $('#crumb'); if (crumb) crumb.textContent = t.label;
+  $('#crumb').textContent = t.label;
   $('#pageTitle').textContent = t.label;
+  $('#pageDesc').textContent = t.desc;
 }
 
 function countUp(el, to) {
@@ -725,212 +743,56 @@ function countUp(el, to) {
   })(t0);
 }
 
-// Each sheet gets metrics selected for its purpose. A metric is only shown when
-// its source column exists; values are calculated from the current live rows.
-const SHEET_METRICS = {
-  daily: [
-    { label: 'Latest Report Date', icon: 'clock', tone: 'blue', re: /^(date|report date|work date|entry date|timestamp)$/i, kind: 'latestDate' },
-    { label: 'Operators Recorded', icon: 'activity', tone: 'violet', re: /(operator|employee|worker|staff)\s*(name)?/i, kind: 'distinct' },
-    { label: 'Total Quantity', icon: 'layers', tone: 'green', re: /^(total\s*)?(qty|quantity|total qty|total quantity|production qty|produced qty)$/i, kind: 'sum' }
-  ],
-  process: [
-    { label: 'Total Process Quantity', icon: 'layers', tone: 'green', re: /(total\s*)?(qty|quantity|production qty|processed qty|output qty)$/i, kind: 'sum' },
-    { label: 'Processes Recorded', icon: 'activity', tone: 'blue', re: /(process|operation|stage)( name)?$/i, kind: 'distinct' },
-    { label: 'Operators Recorded', icon: 'list', tone: 'violet', re: /(operator|employee|worker)( name)?/i, kind: 'distinct' }
-  ],
-  cutting: [
-    { label: 'Total Cutting Quantity', icon: 'layers', tone: 'green', re: /(cut(ting)?\s*)?(total\s*)?(qty|quantity|pieces|pcs)$/i, kind: 'sum' },
-    { label: 'Raw Materials Used', icon: 'database', tone: 'blue', re: /(raw material|material description|material name|material grade|material code)/i, kind: 'distinct' },
-    { label: 'Operators Recorded', icon: 'activity', tone: 'violet', re: /(operator|employee|worker)( name)?/i, kind: 'distinct' }
-  ],
-  stock: [
-    { label: 'Stock Items', icon: 'database', tone: 'blue', re: /^(item name|material name|item description|material description|item code|material code|part name|part number)$/i, kind: 'distinct' },
-    { label: 'Total Stock Quantity', icon: 'layers', tone: 'green', re: /^(current stock|available stock|closing stock|balance qty|balance quantity|stock qty|stock quantity|available qty|available quantity|balance)$/i, kind: 'sum' },
-    { label: 'Zero-Stock Items', icon: 'alert', tone: 'red', re: /^(current stock|available stock|closing stock|balance qty|balance quantity|stock qty|stock quantity|available qty|available quantity|balance)$/i, kind: 'zeroRows' }
-  ],
-  inward: [
-    { label: 'Quantity Received', icon: 'inbox', tone: 'green', re: /(received|inward|receipt|grn).*(qty|quantity)|^(qty received|quantity received|received qty|received quantity)$/i, kind: 'sum' },
-    { label: 'Materials Received', icon: 'database', tone: 'blue', re: /(item name|material name|item description|material description|material code|part name|part number)/i, kind: 'distinct' },
-    { label: 'Latest Receipt Date', icon: 'clock', tone: 'violet', re: /^(date|receipt date|inward date|grn date|received date)$/i, kind: 'latestDate' }
-  ],
-  issue: [
-    { label: 'Quantity Issued', icon: 'send', tone: 'green', re: /(issued|issue).*(qty|quantity)|^(qty issued|quantity issued|issue qty)$/i, kind: 'sum' },
-    { label: 'Items Issued', icon: 'database', tone: 'blue', re: /(item name|material name|item description|material description|material code|part name|part number)/i, kind: 'distinct' },
-    { label: 'Departments / Recipients', icon: 'activity', tone: 'violet', re: /(department|issued to|recipient|machine|employee|operator)/i, kind: 'distinct' }
-  ],
-  toolbuy: [
-    { label: 'Tools / Inserts Listed', icon: 'database', tone: 'blue', re: /(tool name|tool description|insert model|item name|material description|tool code|part number)/i, kind: 'distinct' },
-    { label: 'Required Quantity', icon: 'layers', tone: 'green', re: /(qty|quantity).*(required|req|needed)|^(qty req|quantity required|required qty)$/i, kind: 'sum' },
-    { label: 'Open Requirements', icon: 'clock', tone: 'amber', re: /(status|purchase status|approval status|delivery status)/i, kind: 'pendingRows' }
-  ],
-  consumables: [
-    { label: 'Consumable Types', icon: 'database', tone: 'blue', re: /(item name|consumable name|material name|description|item code|material code)/i, kind: 'distinct' },
-    { label: 'Available Quantity', icon: 'layers', tone: 'green', re: /^(current stock|available stock|closing stock|balance qty|balance quantity|stock qty|stock quantity|available qty|available quantity|balance)$/i, kind: 'sum' },
-    { label: 'Low / Zero Stock', icon: 'alert', tone: 'red', re: /(current stock|available stock|closing stock|balance qty|balance quantity|stock qty|stock quantity|available qty|available quantity|balance)/i, kind: 'lowRows' }
-  ],
-  inserts: [
-    { label: 'Unique Insert Models', icon: 'layers', tone: 'blue', re: /(insert model|model number|insert code|designation|model)$/i, kind: 'distinct' },
-    { label: 'Grades Available', icon: 'database', tone: 'green', re: /^(grade|insert grade|manufacturer grade)$/i, kind: 'distinct' },
-    { label: 'Brands / Manufacturers', icon: 'list', tone: 'violet', re: /(brand|manufacturer|make|supplier)/i, kind: 'distinct' }
-  ],
-  scrap: [
-    { label: 'Scrap / Rejected Quantity', icon: 'alert', tone: 'red', re: /(scrap|reject|rejection).*(qty|quantity)|^(qty scrapped|scrap qty|rejected qty|rejection qty)$/i, kind: 'sum' },
-    { label: 'Affected Material Types', icon: 'database', tone: 'blue', re: /(item name|material name|description|part name|part number|material code)/i, kind: 'distinct' },
-    { label: 'Open Rejections', icon: 'clock', tone: 'amber', re: /(status|disposition|action status)/i, kind: 'pendingRows' }
-  ],
-  physical: [
-    { label: 'Items Verified', icon: 'check', tone: 'blue', re: /(item name|material name|item code|material code|part number|description)/i, kind: 'distinct' },
-    { label: 'Stock Variances', icon: 'alert', tone: 'red', re: /(variance|difference|discrepancy|shortage|excess|mismatch)/i, kind: 'nonZeroRows' },
-    { label: 'Verification Status', icon: 'activity', tone: 'green', re: /(verification status|physical status|reconciliation status|status)/i, kind: 'resolvedRows' }
-  ],
-  vendors: [
-    { label: 'Unique Vendors', icon: 'database', tone: 'blue', re: /^(vendor name|supplier name|vendor|supplier|company name)$/i, kind: 'distinct' },
-    { label: 'Vendor Locations', icon: 'columns', tone: 'green', re: /(city|location|address|industrial area|state)/i, kind: 'distinct' },
-    { label: 'Contact Details Recorded', icon: 'check', tone: 'violet', re: /(phone|mobile|contact|email)/i, kind: 'filledRows' }
-  ],
-  spares: [
-    { label: 'Spare Parts Listed', icon: 'database', tone: 'blue', re: /(spare part|part name|item name|description|part number|item code)/i, kind: 'distinct' },
-    { label: 'Machines Covered', icon: 'activity', tone: 'green', re: /(machine|equipment|asset)/i, kind: 'distinct' },
-    { label: 'Available Spare Quantity', icon: 'layers', tone: 'violet', re: /^(current stock|available stock|balance qty|stock qty|quantity in stock|available qty)$/i, kind: 'sum' }
-  ],
-  calibration: [
-    { label: 'Tools Calibrated', icon: 'check', tone: 'blue', re: /(tool name|instrument|equipment|tool id|instrument id|tool number)/i, kind: 'distinct' },
-    { label: 'Latest Calibration', icon: 'clock', tone: 'green', re: /(last calibration|calibration date|date calibrated|calibrated on)/i, kind: 'latestDate' },
-    { label: 'Due / Overdue', icon: 'alert', tone: 'red', re: /(status|calibration due|due date|next calibration)/i, kind: 'dueRows' }
-  ],
-  locations: [
-    { label: 'Unique Locations', icon: 'columns', tone: 'blue', re: /^(location|location name|bin location|storage location|rack location)$/i, kind: 'distinct' },
-    { label: 'Racks / Bins', icon: 'database', tone: 'green', re: /(rack|bin|shelf|bay|cabinet)/i, kind: 'distinct' },
-    { label: 'Items Assigned', icon: 'layers', tone: 'violet', re: /(item name|material name|item code|material code|part number)/i, kind: 'distinct' }
-  ],
-  damaged: [
-    { label: 'Damaged Items', icon: 'alert', tone: 'red', re: /(item name|material name|item description|part name|part number|item code)/i, kind: 'distinct' },
-    { label: 'Quantity Damaged', icon: 'layers', tone: 'amber', re: /(damaged|broken|affected).*(qty|quantity)|^(qty damaged|damaged qty|broken qty)$/i, kind: 'sum' },
-    { label: 'Unresolved Cases', icon: 'clock', tone: 'violet', re: /(status|action status|disposition)/i, kind: 'pendingRows' }
-  ],
-  gas: [
-    { label: 'Gas Types / Cylinders', icon: 'database', tone: 'blue', re: /(gas type|cylinder type|gas name|cylinder number|cylinder id)/i, kind: 'distinct' },
-    { label: 'Quantity Recorded', icon: 'layers', tone: 'green', re: /(qty|quantity|cylinders received|cylinders issued|cylinder count)/i, kind: 'sum' },
-    { label: 'Latest Gas Entry', icon: 'clock', tone: 'violet', re: /^(date|entry date|issue date|received date|transaction date)$/i, kind: 'latestDate' }
-  ],
-  requests: [
-    { label: 'Open Requests', icon: 'clock', tone: 'amber', re: /(status|request status|problem status|resolution status)/i, kind: 'pendingRows' },
-    { label: 'Urgent / Critical', icon: 'alert', tone: 'red', re: /(priority|severity|urgency)/i, kind: 'urgentRows' },
-    { label: 'Resolved Requests', icon: 'check', tone: 'green', re: /(status|request status|problem status|resolution status)/i, kind: 'resolvedRows' }
-  ]
-};
-
-function numericValue(value) {
-  const s = String(value ?? '').trim().replace(/,/g, '');
-  if (!s || !/^[-+]?\d+(?:\.\d+)?$/.test(s)) return null;
-  return Number(s);
-}
-function metricValue(rows, headers, header, kind) {
-  const vals = rows.map(r => String(r[header] ?? '').trim()).filter(Boolean);
-  if (kind === 'distinct') return new Set(vals.map(v => v.toLowerCase())).size;
-  if (kind === 'sum') {
-    const nums = vals.map(numericValue).filter(v => v !== null);
-    return nums.length ? nums.reduce((a, b) => a + b, 0) : null;
-  }
-  if (kind === 'latestDate') {
-    const dates = vals.map(v => ({ raw: v, time: Date.parse(v) })).filter(x => Number.isFinite(x.time));
-    if (!dates.length) return null;
-    dates.sort((a, b) => b.time - a.time);
-    return dates[0].raw;
-  }
-  if (kind === 'zeroRows' || kind === 'lowRows') {
-    const nums = rows.map(r => numericValue(r[header]));
-    if (!nums.some(v => v !== null)) return null;
-    if (kind === 'lowRows') {
-      const minHeader = headers.find(h => /(minimum|reorder|re-order|reorder level|min stock|safety stock|minimum stock)/i.test(h));
-      if (minHeader) {
-        const pairs = rows.map(r => [numericValue(r[header]), numericValue(r[minHeader])]);
-        return pairs.filter(([stock, min]) => stock !== null && min !== null && stock <= min).length;
-      }
-    }
-    return nums.filter(v => v !== null && v <= 0).length;
-  }
-  if (kind === 'nonZeroRows') {
-    const nums = rows.map(r => numericValue(r[header]));
-    if (nums.some(v => v !== null)) return nums.filter(v => v !== null && v !== 0).length;
-    return rows.filter(r => /mismatch|variance|difference|shortage|excess|discrep|yes|no/i.test(String(r[header] ?? '')) && !/^no\s*(variance|difference|mismatch)?$/i.test(String(r[header] ?? '').trim())).length;
-  }
-  if (kind === 'pendingRows' || kind === 'resolvedRows' || kind === 'urgentRows' || kind === 'dueRows') {
-    const test = {
-      pendingRows: /pending|open|waiting|not started|awaiting|on hold|delayed|unresolved/i,
-      resolvedRows: /complete|completed|closed|resolved|verified|calibrated|approved|done/i,
-      urgentRows: /urgent|critical|high|immediate/i,
-      dueRows: /overdue|due|expired|pending|not calibrated/i
-    }[kind];
-    return vals.filter(v => test.test(v)).length;
-  }
-  if (kind === 'filledRows') return rows.filter(r => String(r[header] ?? '').trim()).length;
-  return null;
-}
-function formatMetricValue(value) {
-  if (typeof value === 'number') return value.toLocaleString('en-IN', { maximumFractionDigits: 2 });
-  return value == null || value === '' ? '—' : String(value);
-}
 function renderMetrics() {
   const d = cur();
-  const ready = d && d.configured && !d.error && !state.firstLoad;
   let cards;
+  const ready = d && d.configured && !d.error && !state.firstLoad;
   if (!ready) {
+    const ph = (label, icon, tone) => ({ label, icon, tone, value: '—', badge: state.firstLoad ? 'Loading' : 'No data', sub: '' });
+    cards = [ph('Total Records', 'list', 'navy'), ph('Completed', 'check', 'green'), ph('In Progress', 'activity', 'blue'), ph('Pending', 'clock', 'amber')];
+  } else if (d.statusCol) {
+    const c = { done: 0, progress: 0, pending: 0, alert: 0 };
+    d.rows.forEach(r => { const b = bucket(r[d.statusCol]); if (b) c[b]++; });
+    const total = d.rows.length, pct = n => total ? Math.round(n / total * 100) : 0;
     cards = [
-      { label: 'Total Entries', icon: 'list', tone: 'navy', value: '—', badge: state.firstLoad ? 'Loading data' : 'Unavailable', sub: '' },
-      { label: 'Key Figure', icon: 'activity', tone: 'blue', value: '—', badge: 'Sheet-specific', sub: '' },
-      { label: 'Latest Activity', icon: 'clock', tone: 'violet', value: '—', badge: 'Date', sub: '' },
-      { label: 'Data Fields', icon: 'columns', tone: 'green', value: '—', badge: 'Columns', sub: '' }
+      { label: 'Total Records', icon: 'list', tone: 'navy', num: total, badge: d.headers.length + ' columns', sub: c.alert ? `${c.alert} need attention` : 'All clear' },
+      { label: 'Completed', icon: 'check', tone: 'green', num: c.done, badge: pct(c.done) + '%', pct: pct(c.done), sub: `of ${total.toLocaleString('en-IN')} records` },
+      { label: 'In Progress', icon: 'activity', tone: 'blue', num: c.progress, badge: pct(c.progress) + '%', pct: pct(c.progress), sub: `of ${total.toLocaleString('en-IN')} records` },
+      { label: 'Pending', icon: 'clock', tone: 'amber', num: c.pending, badge: pct(c.pending) + '%', pct: pct(c.pending), sub: `of ${total.toLocaleString('en-IN')} records` }
     ];
   } else {
-    cards = [{ label: 'Total Entries', icon: 'list', tone: 'navy', num: d.rows.length, badge: 'Live count', sub: '' }];
-    const usedHeaders = new Set();
-    const rules = SHEET_METRICS[state.tab] || [];
-    for (const rule of rules) {
-      const header = d.headers.find(h => rule.re.test(h));
-      if (!header) continue;
-      const value = metricValue(d.rows, d.headers, header, rule.kind);
-      if (value === null || value === undefined) continue;
-      usedHeaders.add(header);
-      cards.push({ label: rule.label, icon: rule.icon, tone: rule.tone, value: formatMetricValue(value), badge: header, sub: rule.kind === 'sum' ? 'Sum of recorded values' : rule.kind === 'distinct' ? 'Unique recorded values' : rule.kind === 'latestDate' ? 'Most recent valid date' : 'Count from recorded fields' });
-      if (cards.length === 4) break;
-    }
-    // If a sheet does not have a matching specialized field, use meaningful live
-    // schema facts instead of repeating Completed / In Progress / Pending cards.
-    const dateHeader = d.headers.find(h => /date|timestamp|time/i.test(h));
-    if (cards.length < 4 && dateHeader && !usedHeaders.has(dateHeader)) {
-      const latest = metricValue(d.rows, d.headers, dateHeader, 'latestDate');
-      if (latest !== null) {
-        cards.push({ label: 'Latest Activity', icon: 'clock', tone: 'violet', value: formatMetricValue(latest), badge: dateHeader, sub: 'Most recent valid date' });
-        usedHeaders.add(dateHeader);
-      }
-    }
-    for (const h of d.headers) {
-      if (cards.length >= 4) break;
-      if (usedHeaders.has(h) || /date|timestamp|time|status/i.test(h)) continue;
-      const n = metricValue(d.rows, d.headers, h, 'distinct');
-      if (n === null) continue;
-      cards.push({ label: 'Unique ' + h, icon: 'database', tone: cards.length % 2 ? 'blue' : 'green', value: formatMetricValue(n), badge: h, sub: 'Distinct recorded values' });
-      usedHeaders.add(h);
-    }
-    if (cards.length < 4) cards.push({ label: 'Data Fields', icon: 'columns', tone: 'blue', num: d.headers.length, badge: 'Columns', sub: '' });
-    if (cards.length < 4) cards.push({ label: 'Latest Sync', icon: 'clock', tone: 'brand', value: state.lastSync ? state.lastSync.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—', badge: 'Auto refresh', sub: '' });
+    const filled = d.rows.reduce((a, r) => a + d.headers.filter(h => String(r[h] ?? '').trim()).length, 0);
+    const cells = d.rows.length * d.headers.length;
+    cards = [
+      { label: 'Total Records', icon: 'list', tone: 'navy', num: d.rows.length, badge: 'Live', sub: 'Rows in this sheet' },
+      { label: 'Columns', icon: 'columns', tone: 'blue', num: d.headers.length, badge: 'Schema', sub: 'Detected from the header row' },
+      { label: 'Completeness', icon: 'check', tone: 'green', value: cells ? Math.round(filled / cells * 100) + '%' : '—', badge: 'Filled', pct: cells ? Math.round(filled / cells * 100) : 0, sub: 'Non-empty cells' },
+      { label: 'Last Sync', icon: 'clock', tone: 'brand', value: state.lastSync ? state.lastSync.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—', badge: 'Auto', sub: 'Refreshes every minute' }
+    ];
   }
 
-  $('#metrics').innerHTML = cards.slice(0, 4).map(c => `
+  $('#metrics').innerHTML = cards.map(c => `
     <div class="tn-${c.tone} rounded-lg border border-line bg-surface p-5 shadow-card transition-shadow duration-200 hover:shadow-pop ${state.animate ? 'row-in' : ''}" style="border-top:3px solid var(--fg)">
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
-          <p class="text-[11.5px] font-semibold uppercase tracking-wider text-soft">${esc(c.label)}</p>
+          <p class="text-[11.5px] font-semibold uppercase tracking-wider text-soft">${c.label}</p>
           <div class="mt-3 text-[32px] font-semibold leading-none tracking-tight tabular-nums text-ink" ${c.num != null ? `data-count="${c.num}"` : ''}>${c.num != null ? 0 : esc(c.value)}</div>
         </div>
         <span class="tint grid h-10 w-10 shrink-0 place-items-center rounded-lg">${ic(c.icon, 'h-[18px] w-[18px]')}</span>
       </div>
-      ${(c.badge || c.sub) ? `<div class="mt-4 flex items-center gap-2 text-xs">${c.badge ? `<span class="badge tint nodot">${esc(c.badge)}</span>` : ''}${c.sub ? `<span class="truncate text-faint">${esc(c.sub)}</span>` : ''}</div>` : ''}
-      <div class="mt-3 h-1"></div>
+      <div class="mt-4 flex items-center gap-2 text-xs">
+        <span class="badge tint nodot">${esc(c.badge)}</span>
+        <span class="truncate text-faint">${esc(c.sub || '')}</span>
+      </div>
+      ${c.pct != null ? `<div class="mt-3 h-1 overflow-hidden rounded-full bg-sunken"><div class="bar h-full rounded-full transition-[width] duration-700 ease-out" data-w="${c.pct}" style="width:0;background:var(--fg)"></div></div>` : '<div class="mt-3 h-1"></div>'}
     </div>`).join('');
+
   $('#metrics').querySelectorAll('[data-count]').forEach(el => countUp(el, +el.dataset.count));
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $('#metrics').querySelectorAll('.bar').forEach(b => { b.style.width = b.dataset.w + '%'; });
+  }));
 }
+
 function renderChips() {
   const d = cur(), box = $('#chips');
   if (!d || !d.statusCol || !d.rows.length) { box.innerHTML = ''; return; }
@@ -1109,7 +971,6 @@ function tickClock() {
 }
 function updateSync() {
   const dot = $('#syncDot'), txt = $('#syncText');
-  if (!dot || !txt) return;
   const hasErr = Object.values(state.data).some(d => d.error);
   let label, tone;
   if (state.loading) { label = 'Syncing…'; tone = 'amber'; }
@@ -1144,9 +1005,9 @@ function startApp() {
 
 hydrateIcons();
 buildPinBoxes();
-document.querySelectorAll('#sidebar img[data-logo]').forEach(img => { img.src = LOGO; });
+document.querySelectorAll('img[data-logo]').forEach(img => { img.src = LOGO; });
 document.querySelectorAll('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
-
+(function () { const l = document.createElement('link'); l.rel = 'icon'; l.type = 'image/png'; l.href = LOGO; document.head.appendChild(l); })();
 
 $('#pinForm').addEventListener('submit', e => { e.preventDefault(); submitPin(); });
 $('#logoutBtn').addEventListener('click', lock);
