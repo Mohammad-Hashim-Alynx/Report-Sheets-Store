@@ -213,35 +213,9 @@
 <!-- ═════════════════════════ SIGN-IN ═════════════════════════ -->
 <div id="login" class="fixed inset-0 z-50 grid bg-surface lg:grid-cols-[1.05fr_1fr]">
 
-  <!-- Brand panel (desktop) -->
-  <div class="login-hero relative hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex">
-    <div class="hero-grid pointer-events-none absolute inset-0"></div>
-    <div class="relative flex items-center gap-3">
-      <div class="logo-tile h-11 w-11"><img data-logo alt="GIGA DYNAMICS logo"></div>
-      <div class="text-[15px] font-semibold tracking-[.14em]">GIGA DYNAMICS</div>
-    </div>
-
-    <div class="relative max-w-md">
-      <h1 class="text-[38px] font-semibold leading-[1.1] tracking-tight">Live Dashboard</h1>
-      <p class="mt-4 text-[15px] leading-relaxed text-white/70">Real-time visibility into daily operations, inward material, store issues and stock levels — straight from your live data sheets.</p>
-      <ul class="mt-8 space-y-3 text-sm text-white/85">
-        <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>Daily work updates and task status</li>
-        <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>Inward material and store issue logs</li>
-        <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>Stock register with automatic alerts</li>
-      </ul>
-    </div>
-
-    <div class="relative text-xs text-white/45">© <span data-year></span> GIGA DYNAMICS. Confidential — authorised personnel only.</div>
-  </div>
-
   <!-- Form panel -->
   <div class="relative grid place-items-center p-6">
     <div class="login-card w-full max-w-[380px]">
-      <div class="mb-8 flex items-center gap-3 lg:hidden">
-        <div class="logo-tile h-11 w-11 border border-line"><img data-logo alt="GIGA DYNAMICS logo"></div>
-        <div class="leading-tight"><div class="text-[15px] font-semibold tracking-[.12em]">GIGA DYNAMICS</div><div class="text-xs text-soft">Live Dashboard</div></div>
-      </div>
-
       <h2 class="text-2xl font-semibold tracking-tight">Sign in</h2>
       <p class="mt-1.5 text-sm text-soft">Enter your access PIN to open the live dashboard.</p>
 
@@ -252,7 +226,6 @@
         <button id="pinBtn" type="submit" class="btn btn-primary mt-2 !h-11 w-full !text-sm">Sign in</button>
       </form>
 
-      <p class="mt-6 flex items-center gap-1.5 text-xs text-faint"><svg data-i="lock" class="h-3.5 w-3.5"></svg>Secure session · ends when this tab is closed</p>
     </div>
   </div>
 </div>
@@ -269,22 +242,15 @@
         <div class="logo-tile h-9 w-9"><img data-logo alt="GIGA DYNAMICS logo"></div>
         <div class="brand-text min-w-0 leading-tight">
           <div class="truncate text-[13.5px] font-semibold tracking-[.12em]">GIGA DYNAMICS</div>
-          <div class="text-[11px] font-medium text-brand">Live Dashboard</div>
         </div>
       </div>
 
       <nav class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5" aria-label="Dashboard reports">
-        <div class="brand-text mb-2 px-2.5 text-[10.5px] font-semibold uppercase tracking-[.14em] text-white/40">Reports</div>
         <div id="nav" class="space-y-0.5"></div>
       </nav>
 
       <div class="side-sep border-t p-3">
-        <div class="user-row flex items-center gap-2.5">
-          <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-bold text-white">GD</div>
-          <div class="user-text min-w-0 flex-1 leading-tight">
-            <div class="truncate text-[13px] font-medium">Administrator</div>
-            <div class="truncate text-[11px] text-white/50">Management access</div>
-          </div>
+        <div class="flex justify-end">
           <button id="logoutBtn" class="grid h-8 w-8 place-items-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-white" title="Lock dashboard" aria-label="Lock dashboard"><svg data-i="logout" class="h-4 w-4"></svg></button>
         </div>
       </div>
@@ -297,11 +263,8 @@
       <header class="sticky top-0 z-20 flex h-[60px] items-center gap-3 border-b border-t-[3px] border-line border-t-brand bg-surface px-4 sm:px-6">
         <button id="sidebarToggle" class="ibtn -ml-1" title="Toggle sidebar" aria-label="Toggle sidebar"><svg data-i="panel" class="h-[18px] w-[18px]"></svg></button>
         <div class="hidden h-5 w-px bg-line sm:block"></div>
-        <div class="flex min-w-0 items-center gap-2 text-[13px]">
-          <span class="hidden sm:inline-flex items-center gap-2 font-semibold tracking-wide"><img data-logo alt="GIGA DYNAMICS logo" class="h-6 w-6 rounded-md bg-white object-contain p-0.5">GIGA DYNAMICS</span>
-          <span class="hidden text-soft sm:inline">Live Dashboard</span>
-          <span class="hidden text-faint sm:inline">/</span>
-          <span id="crumb" class="truncate font-medium text-soft">Daily Work Updates</span>
+        <div class="flex min-w-0 items-center text-[13px]">
+          <span id="crumb" class="truncate font-semibold text-ink">Daily Reports</span>
         </div>
 
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
@@ -328,13 +291,6 @@
         <div class="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="pageTitle" class="text-2xl font-semibold tracking-tight">Daily Work Updates</h2>
-            <p id="pageDesc" class="mt-1 text-sm text-soft"></p>
-          </div>
-          <div class="flex items-center gap-2.5 rounded-md border border-line bg-surface px-3 py-1.5 text-xs text-soft shadow-card">
-            <span id="syncDot" class="dot tn-slate"></span>
-            <span id="syncText" class="font-medium text-ink">Not synced</span>
-            <span class="text-line">|</span>
-            <span id="lastUpdated" class="tabular-nums">—</span>
           </div>
         </div>
 
@@ -365,10 +321,6 @@
           <div id="pager" class="flex items-center justify-between gap-3 border-t border-line px-4 py-3 text-xs text-soft"></div>
         </section>
 
-        <footer class="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-5 text-xs text-faint">
-          <span>© <span data-year></span> GIGA DYNAMICS. All rights reserved.</span>
-          <span>Live data from Google Sheets · refreshes every minute · Internal use only</span>
-        </footer>
       </main>
     </div>
   </div>
@@ -759,9 +711,8 @@ function updateNavCounts() {
 
 function renderHeaderTitle() {
   const t = TABS[state.tab];
-  $('#crumb').textContent = t.label;
+  const crumb = $('#crumb'); if (crumb) crumb.textContent = t.label;
   $('#pageTitle').textContent = t.label;
-  $('#pageDesc').textContent = t.desc;
 }
 
 function countUp(el, to) {
@@ -926,13 +877,13 @@ function renderMetrics() {
   let cards;
   if (!ready) {
     cards = [
-      { label: 'Total Entries', icon: 'list', tone: 'navy', value: '—', badge: state.firstLoad ? 'Loading data' : 'Unavailable', sub: 'Rows recorded in this sheet' },
-      { label: 'Key Figure', icon: 'activity', tone: 'blue', value: '—', badge: 'Sheet-specific', sub: 'Calculated from available columns' },
-      { label: 'Latest Activity', icon: 'clock', tone: 'violet', value: '—', badge: 'Date', sub: 'When a date field is available' },
-      { label: 'Data Fields', icon: 'columns', tone: 'green', value: '—', badge: 'Columns', sub: 'Fields detected in this sheet' }
+      { label: 'Total Entries', icon: 'list', tone: 'navy', value: '—', badge: state.firstLoad ? 'Loading data' : 'Unavailable', sub: '' },
+      { label: 'Key Figure', icon: 'activity', tone: 'blue', value: '—', badge: 'Sheet-specific', sub: '' },
+      { label: 'Latest Activity', icon: 'clock', tone: 'violet', value: '—', badge: 'Date', sub: '' },
+      { label: 'Data Fields', icon: 'columns', tone: 'green', value: '—', badge: 'Columns', sub: '' }
     ];
   } else {
-    cards = [{ label: 'Total Entries', icon: 'list', tone: 'navy', num: d.rows.length, badge: 'Live count', sub: 'Rows recorded in this sheet' }];
+    cards = [{ label: 'Total Entries', icon: 'list', tone: 'navy', num: d.rows.length, badge: 'Live count', sub: '' }];
     const usedHeaders = new Set();
     const rules = SHEET_METRICS[state.tab] || [];
     for (const rule of rules) {
@@ -962,8 +913,8 @@ function renderMetrics() {
       cards.push({ label: 'Unique ' + h, icon: 'database', tone: cards.length % 2 ? 'blue' : 'green', value: formatMetricValue(n), badge: h, sub: 'Distinct recorded values' });
       usedHeaders.add(h);
     }
-    if (cards.length < 4) cards.push({ label: 'Data Fields', icon: 'columns', tone: 'blue', num: d.headers.length, badge: 'Columns', sub: 'Fields detected in this sheet' });
-    if (cards.length < 4) cards.push({ label: 'Latest Sync', icon: 'clock', tone: 'brand', value: state.lastSync ? state.lastSync.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—', badge: 'Auto refresh', sub: 'Refreshes every minute' });
+    if (cards.length < 4) cards.push({ label: 'Data Fields', icon: 'columns', tone: 'blue', num: d.headers.length, badge: 'Columns', sub: '' });
+    if (cards.length < 4) cards.push({ label: 'Latest Sync', icon: 'clock', tone: 'brand', value: state.lastSync ? state.lastSync.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—', badge: 'Auto refresh', sub: '' });
   }
 
   $('#metrics').innerHTML = cards.slice(0, 4).map(c => `
@@ -975,10 +926,7 @@ function renderMetrics() {
         </div>
         <span class="tint grid h-10 w-10 shrink-0 place-items-center rounded-lg">${ic(c.icon, 'h-[18px] w-[18px]')}</span>
       </div>
-      <div class="mt-4 flex items-center gap-2 text-xs">
-        <span class="badge tint nodot">${esc(c.badge || '')}</span>
-        <span class="truncate text-faint">${esc(c.sub || '')}</span>
-      </div>
+      ${(c.badge || c.sub) ? `<div class="mt-4 flex items-center gap-2 text-xs">${c.badge ? `<span class="badge tint nodot">${esc(c.badge)}</span>` : ''}${c.sub ? `<span class="truncate text-faint">${esc(c.sub)}</span>` : ''}</div>` : ''}
       <div class="mt-3 h-1"></div>
     </div>`).join('');
   $('#metrics').querySelectorAll('[data-count]').forEach(el => countUp(el, +el.dataset.count));
@@ -1161,6 +1109,7 @@ function tickClock() {
 }
 function updateSync() {
   const dot = $('#syncDot'), txt = $('#syncText');
+  if (!dot || !txt) return;
   const hasErr = Object.values(state.data).some(d => d.error);
   let label, tone;
   if (state.loading) { label = 'Syncing…'; tone = 'amber'; }
@@ -1195,9 +1144,9 @@ function startApp() {
 
 hydrateIcons();
 buildPinBoxes();
-document.querySelectorAll('img[data-logo]').forEach(img => { img.src = LOGO; });
+document.querySelectorAll('#sidebar img[data-logo]').forEach(img => { img.src = LOGO; });
 document.querySelectorAll('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
-(function () { const l = document.createElement('link'); l.rel = 'icon'; l.type = 'image/png'; l.href = LOGO; document.head.appendChild(l); })();
+
 
 $('#pinForm').addEventListener('submit', e => { e.preventDefault(); submitPin(); });
 $('#logoutBtn').addEventListener('click', lock);
