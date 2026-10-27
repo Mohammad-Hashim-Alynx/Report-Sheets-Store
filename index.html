@@ -224,7 +224,7 @@
 
     <div class="relative max-w-md">
       <h1 class="text-[38px] font-semibold leading-[1.1] tracking-tight">Live Dashboard</h1>
-      <p class="mt-4 text-[15px] leading-relaxed text-white/70">Real-time visibility into daily operations, inward material, store issues and stock levels — straight from your live data sheets.</p>
+      <p class="mt-4 text-[15px] leading-relaxed text-white/70">Real-time visibility into daily production, inward material, store issues and stock levels — straight from your live data sheets.</p>
       <ul class="mt-8 space-y-3 text-sm text-white/85">
         <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>18 live reports in one place</li>
         <li class="flex items-center gap-3"><span class="grid h-6 w-6 place-items-center rounded-full bg-white/10 text-brand"><svg data-i="check" class="h-3.5 w-3.5"></svg></span>Inward material and store issue logs</li>
@@ -301,7 +301,7 @@
           <span class="hidden sm:inline-flex items-center gap-2 font-semibold tracking-wide"><img data-logo alt="GIGA DYNAMICS logo" class="h-6 w-6 rounded-md bg-white object-contain p-0.5">GIGA DYNAMICS</span>
           <span class="hidden text-soft sm:inline">Live Dashboard</span>
           <span class="hidden text-faint sm:inline">/</span>
-          <span id="crumb" class="truncate font-medium text-soft">Daily Work Updates</span>
+          <span id="crumb" class="truncate font-medium text-soft">Daily reports</span>
         </div>
 
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
@@ -327,7 +327,7 @@
 
         <div class="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 id="pageTitle" class="text-2xl font-semibold tracking-tight">Daily Work Updates</h2>
+            <h2 id="pageTitle" class="text-2xl font-semibold tracking-tight">Daily reports</h2>
             <p id="pageDesc" class="mt-1 text-sm text-soft"></p>
           </div>
           <div class="flex items-center gap-2.5 rounded-md border border-line bg-surface px-3 py-1.5 text-xs text-soft shadow-card">
@@ -381,11 +381,7 @@
 
 // Publish each Google Sheet tab: File → Share → Publish to web → choose the tab → CSV.
 const SHEET_URLS = {
-  // Original live sheet
-  daily: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSjRsijk74NONtJhRXlaHDLZZh4kCAItsAUafu0dOc7mUbko3KYyTDMEHKTLgf0K_DyNBHOtvRbr4wL/pub?gid=1174347993&single=true&output=csv',
-
-  // ── GIGA DYNAMICS operational sheets ──────────────────────────────
-  // 1) Daily reports
+  // 1) Daily reports  (default view)
   daily_reports: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=0&single=true&output=csv',
   // 2) Process Report
   process_report: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=154235953&single=true&output=csv',
@@ -424,7 +420,6 @@ const SHEET_URLS = {
 };
 
 const TABS = {
-  daily:                { label: 'Daily Work Updates', desc: 'Day-to-day tasks, owners and progress across the team.', icon: 'clipboard' },
   daily_reports:        { label: 'Daily reports', desc: 'Daily production and work reports.', icon: 'clipboard' },
   process_report:       { label: 'Process Report', desc: 'Process-wise production and operation report.', icon: 'activity' },
   raw_material_cutting: { label: 'Raw Material Cutting', desc: 'Raw material cutting records and quantities.', icon: 'scissors' },
@@ -445,9 +440,9 @@ const TABS = {
   requests_problems:    { label: 'Requests and Problems', desc: 'Store requests, issues and problem tracking.', icon: 'message-square' }
 };
 
-// Sidebar grouping — keeps 18+ reports readable instead of one endless list.
+// Sidebar grouping — keeps the report list readable instead of one endless column.
 const NAV_GROUPS = [
-  { label: 'Work & Production', keys: ['daily', 'daily_reports', 'process_report', 'raw_material_cutting'] },
+  { label: 'Work & Production', keys: ['daily_reports', 'process_report', 'raw_material_cutting'] },
   { label: 'Store & Inventory',  keys: ['stock_master', 'inward_grn', 'material_issue', 'physical_stock', 'consumables', 'inserts_catalogue', 'scrap_rejection', 'damaged_items', 'gas_record'] },
   { label: 'Tools & Maintenance', keys: ['tool_purchase', 'machine_spares', 'tool_calibration'] },
   { label: 'Masters & Support',   keys: ['vendor_master', 'location_master', 'requests_problems'] }
@@ -561,7 +556,7 @@ function detectStatusCol(rows, headers) {
 /* ══════════════════════════ STATE ══════════════════════════ */
 
 const state = {
-  authed: false, tab: 'daily', data: {}, loading: false, firstLoad: true,
+  authed: false, tab: 'daily_reports', data: {}, loading: false, firstLoad: true,
   query: '', filter: 'all', sort: { col: null, dir: 1 }, page: 1,
   lastSync: null, view: [], animate: true
 };
@@ -693,6 +688,7 @@ function lock() {
   $('#tbody').innerHTML = ''; $('#thead').innerHTML = ''; $('#metrics').innerHTML = ''; $('#chips').innerHTML = '';
   $('#pager').innerHTML = ''; $('#resultCount').textContent = ''; $('#search').value = '';
   state.data = {}; state.firstLoad = true; state.lastSync = null;
+  state.tab = 'daily_reports';
   state.query = ''; state.filter = 'all'; state.page = 1; state.sort = { col: null, dir: 1 };
   const login = $('#login');
   login.classList.remove('hidden');
