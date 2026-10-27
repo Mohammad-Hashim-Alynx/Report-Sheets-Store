@@ -379,14 +379,52 @@ const SHEET_URLS = {
   daily:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSjRsijk74NONtJhRXlaHDLZZh4kCAItsAUafu0dOc7mUbko3KYyTDMEHKTLgf0K_DyNBHOtvRbr4wL/pub?gid=1174347993&single=true&output=csv',
   inward: '',
   store:  '',
-  stock:  ''
+  stock:  '',
+  // Additional published sheets supplied for the GIGA DYNAMICS dashboard
+  daily_reports: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=0&single=true&output=csv',
+  process_report: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=154235953&single=true&output=csv',
+  raw_material_cutting: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1113602434&single=true&output=csv',
+  stock_master: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1&single=true&output=csv',
+  inward_grn: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=2&single=true&output=csv',
+  material_issue: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=3&single=true&output=csv',
+  tool_purchase: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=5&single=true&output=csv',
+  consumables: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=6&single=true&output=csv',
+  inserts_catalogue: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=199450532&single=true&output=csv',
+  scrap_rejection: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=7&single=true&output=csv',
+  physical_stock: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=8&single=true&output=csv',
+  vendor_master: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1209421226&single=true&output=csv',
+  machine_spares: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1488564858&single=true&output=csv',
+  tool_calibration: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=221320726&single=true&output=csv',
+  location_master: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=474953076&single=true&output=csv',
+  damaged_items: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1923538532&single=true&output=csv',
+  gas_record: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=600886454&single=true&output=csv',
+  requests_problems: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRwr1qr20q_mN2GKeEL-YU2QGTOGbmMHnXpYZ-_Lf9ZdTGvY2huFar_lVjOdQ_9W6gZ4gQE4vxnaRlI/pub?gid=1768208708&single=true&output=csv'
 };
 
 const TABS = {
-  daily:  { label: 'Daily Work Updates', desc: 'Day-to-day tasks, owners and progress across the team.',            icon: 'clipboard' },
-  inward: { label: 'Inward Material',    desc: 'Material received at the store, with supplier and challan details.', icon: 'inbox' },
-  store:  { label: 'Store Issue Log',    desc: 'Items issued from the store to departments and jobs.',               icon: 'send' },
-  stock:  { label: 'Stock Register',     desc: 'Current stock levels and reorder alerts.',                           icon: 'layers' }
+  daily:  { label: 'Daily Work Updates', desc: 'Day-to-day tasks, owners and progress across the team.', icon: 'clipboard' },
+  inward: { label: 'Inward Material', desc: 'Material received at the store, with supplier and challan details.', icon: 'inbox' },
+  store:  { label: 'Store Issue Log', desc: 'Items issued from the store to departments and jobs.', icon: 'send' },
+  stock:  { label: 'Stock Register', desc: 'Current stock levels and reorder alerts.', icon: 'layers' },
+  // Additional sheets
+  daily_reports: { label: 'Daily reports', desc: 'Daily production and work reports.', icon: 'clipboard' },
+  process_report: { label: 'Process Report', desc: 'Process-wise production and operation report.', icon: 'activity' },
+  raw_material_cutting: { label: 'Raw Material Cutting', desc: 'Raw material cutting records and quantities.', icon: 'scissors' },
+  stock_master: { label: 'Stock Master', desc: 'Master list of stock items and balances.', icon: 'layers' },
+  inward_grn: { label: 'Inward/GRN', desc: 'Material inward and goods receipt records.', icon: 'inbox' },
+  material_issue: { label: 'Material Issue Register', desc: 'Material issued to jobs, machines or departments.', icon: 'send' },
+  tool_purchase: { label: 'Detailed Tool Purchase list', desc: 'Detailed tool purchase requirements and records.', icon: 'shopping-cart' },
+  consumables: { label: 'Consumables', desc: 'Consumables inventory and usage records.', icon: 'package' },
+  inserts_catalogue: { label: 'Inserts Catalogue', desc: 'Catalogue of CNC cutting inserts.', icon: 'grid-3x3' },
+  scrap_rejection: { label: 'Scrap and Rejection', desc: 'Scrap quantities and rejected material records.', icon: 'trash-2' },
+  physical_stock: { label: 'Physical Stock Verification', desc: 'Physical verification and stock reconciliation.', icon: 'clipboard-check' },
+  vendor_master: { label: 'Vendor Master', desc: 'Supplier details and vendor master records.', icon: 'building-2' },
+  machine_spares: { label: 'Spare parts of Machines', desc: 'Machine spare parts and maintenance inventory.', icon: 'wrench' },
+  tool_calibration: { label: 'Tool calibration & Calibration Certificate history', desc: 'Calibration status and certificate history for tools.', icon: 'ruler' },
+  location_master: { label: 'Location master', desc: 'Storage locations and rack/location references.', icon: 'map-pin' },
+  damaged_items: { label: 'Broken/Damaged Item report', desc: 'Broken and damaged inventory item records.', icon: 'alert-triangle' },
+  gas_record: { label: 'Gas Record', desc: 'Gas stock, receipt and consumption records.', icon: 'flame' },
+  requests_problems: { label: 'Requests and Problems', desc: 'Store requests, issues and problem tracking.', icon: 'message-square' }
 };
 
 // SHA-256 hash for the dashboard password. NOTE: client-side checks are not secure
